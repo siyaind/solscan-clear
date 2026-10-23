@@ -375,6 +375,7 @@ describe("explorer input and shareable investigation context", () => {
       layer: "evidence" as const,
       perspective: DESIGN_RECIPIENT,
       selection: "ix:0",
+      subject: "account:1",
     };
     const url = writeViewState(
       "https://clear.example/tx/demo-design-transfer",
@@ -390,6 +391,7 @@ describe("explorer input and shareable investigation context", () => {
       layer: "impact",
       perspective: DESIGN_PAYER,
       selection: "account:0",
+      subject: "account:0",
     });
   });
   it("opens the matching evidence category", () => {

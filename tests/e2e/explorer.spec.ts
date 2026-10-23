@@ -23,7 +23,7 @@ test("question-first home and genuine live search validation", async ({
   await expect(page).toHaveURL(/\/$/);
 });
 
-test("MRI layers retain selected evidence and perspective", async ({
+test("anatomy depths retain selected evidence and perspective", async ({
   page,
 }, testInfo) => {
   await page.goto("/");
@@ -34,14 +34,13 @@ test("MRI layers retain selected evidence and perspective", async ({
   await expect(
     page.getByText("Recorded mainnet example", { exact: true }),
   ).toBeVisible();
+  await expect(page.locator(".anatomy-anchor")).toBeVisible();
+  await page
+    .getByRole("slider", { name: "Exploration depth" })
+    .press("ArrowRight");
   await expect(
-    page.getByRole("heading", { name: "What changed, exactly?" }),
-  ).toBeVisible();
-  await page.getByRole("tab", { name: /Impact/ }).press("ArrowRight");
-  await expect(page.getByRole("tab", { name: /Connections/ })).toHaveAttribute(
-    "aria-selected",
-    "true",
-  );
+    page.getByRole("button", { name: /^Structure/ }),
+  ).toHaveAttribute("aria-pressed", "true");
   await expect(
     page.getByRole("heading", { name: "Follow the connections." }),
   ).toBeVisible();
@@ -52,25 +51,24 @@ test("MRI layers retain selected evidence and perspective", async ({
     await page.getByRole("button", { name: "Fit graph to view" }).click();
     await expect(page.getByText("100%", { exact: true })).toBeVisible();
     await page
-      .getByRole("button", { name: /Inspect .* account/ })
+      .locator(".graph-transform")
+      .getByRole("button", { name: /account/ })
       .first()
       .click();
   } else await page.locator(".mobile-map-list button").nth(1).click();
   const selectedTitle = await page
     .locator(".sr-only[aria-live='polite']")
     .innerText();
-  await page.getByRole("tab", { name: /Evidence/ }).click();
+  await page.getByRole("button", { name: /^Proof/ }).click();
   await expect(page.locator(".sr-only[aria-live='polite']")).toHaveText(
     selectedTitle,
   );
   const select = page.getByLabel("Viewing impact for", { exact: true });
   const next = await select.locator("option").nth(1).getAttribute("value");
   await select.selectOption(next!);
-  await page.getByRole("tab", { name: /Impact/ }).click();
+  await page.getByRole("button", { name: /^Outcome/ }).click();
   await expect(select).toHaveValue(next!);
-  await expect(
-    page.getByRole("heading", { name: "What changed, exactly?" }),
-  ).toBeVisible();
+  await expect(page.locator(".anatomy-anchor")).toBeVisible();
 });
 
 test("failed finalized transaction has fees and no movement arrows", async ({
@@ -88,7 +86,7 @@ test("failed finalized transaction has fees and no movement arrows", async ({
   await expect(
     page.getByText("0.000007388 SOL", { exact: true }).first(),
   ).toBeVisible();
-  await page.getByRole("tab", { name: /Connections/ }).click();
+  await page.getByRole("button", { name: /^Structure/ }).click();
   await expect(page.locator(".graph-edge.movement")).toHaveCount(0);
   await expect(
     page.getByText(
@@ -143,7 +141,10 @@ test("evidence raw JSON, copy feedback, theme and responsive screenshots", async
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
     "synthetic-design-transfer",
   );
-  await page.getByRole("tab", { name: /Evidence/ }).click();
+  await page.getByRole("button", { name: /^Proof/ }).click();
+  await page
+    .getByText("Browse the complete transaction record", { exact: true })
+    .click();
   await page.getByRole("tab", { name: "Raw JSON", exact: true }).click();
   await expect(page.locator(".raw-view pre")).toContainText("250000000");
   if (testInfo.project.name === "mobile") {
@@ -189,9 +190,7 @@ test("evidence raw JSON, copy feedback, theme and responsive screenshots", async
   }
   if (testInfo.project.name === "mobile") {
     await page.goto("/tx/demo-swap-success-6?layer=evidence");
-    await expect(
-      page.getByRole("heading", { name: "The record behind the story." }),
-    ).toBeVisible();
+    await expect(page.locator(".evidence-peel.open")).toBeVisible();
     await page
       .getByRole("button", { name: "Inspect selected evidence" })
       .click();

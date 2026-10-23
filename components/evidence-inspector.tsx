@@ -126,8 +126,8 @@ export function EvidenceInspector({
             </details>
             <button className="inspector-action" onClick={onEvidence}>
               {layer === "evidence"
-                ? "Evidence layer is open"
-                : "Follow the evidence"}
+                ? "Show selected proof"
+                : "Reveal selected proof"}
               <ArrowUpRight size={16} />
             </button>
           </>

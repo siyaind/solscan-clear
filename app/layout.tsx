@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { AppShell } from "@/components/app-shell";
 import "./globals.css";
 import "./audit-improvements.css";
+import "./anatomy.css";
 
 export const metadata: Metadata = {
   title: "Solscan / CLEAR — See what happened.",
@@ -14,7 +15,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" data-scroll-behavior="smooth" suppressHydrationWarning>
       <body>
         <AppShell>{children}</AppShell>
       </body>

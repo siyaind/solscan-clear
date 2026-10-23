@@ -9,9 +9,9 @@ The contest requires a real Figma file with before/after screens, mobile and des
 | Original Solscan transaction overview     | Captured; files below                     | Captured; files below            | Same recorded signature as the redesigned example     |
 | Original Solscan balance changes / TX Map | Captured; files below                     | Captured; files below            | Show the existing interactions fairly                 |
 | CLEAR question-first homepage             | `home-desktop.png`                        | `home-mobile.png`                | `docs/screenshots/`                                   |
-| CLEAR MRI / Impact                        | `impact-desktop.png`                      | `impact-mobile.png`              | Native delta, fees, unknown remainder, token balances |
-| CLEAR MRI / Connections                   | `connections-desktop.png`                 | `connections-mobile.png`         | Distinct edge types and vertical mobile directory     |
-| CLEAR MRI / Evidence                      | `evidence-desktop.png`                    | `evidence-mobile.png`            | Matching selection and field references               |
+| CLEAR Anatomy / Outcome                   | `impact-desktop.png`                      | `impact-mobile.png`              | Native delta, fees, unknown remainder, token balances |
+| CLEAR Anatomy / Structure                 | `connections-desktop.png`                 | `connections-mobile.png`         | Distinct edge types and vertical mobile directory     |
+| CLEAR Anatomy / Proof                     | `evidence-desktop.png`                    | `evidence-mobile.png`            | Matching selection and field references               |
 | CLEAR / Address Compare                   | `compare-desktop.png`                     | `compare-mobile.png`             | Add a filled difference example as an extra state     |
 | CLEAR / Failure                           | Capture from `/tx/demo-transfer-failed-9` | Same route at mobile width       | Charged fee and no committed transfers                |
 | CLEAR / Mobile inspector open             | Not applicable                            | Open “Inspect selected evidence” | Bottom evidence sheet                                 |
@@ -28,13 +28,15 @@ Six before screenshots were captured from the actual Solscan product on 23 Octob
 
 The end-to-end suite also saves `failure-desktop.png`, `failure-mobile.png`, and `inspector-mobile.png`. The compare captures include the filled single-character-difference example.
 
+The additional `anatomy-outcome-desktop.png`, `anatomy-outcome-mobile.png`, `anatomy-proof-desktop.png`, and `anatomy-proof-mobile.png` captures show the explicitly synthetic transfer and its exact fee breakdown. Use these as interaction demonstrations, not as before/after comparisons with a real transaction.
+
 ## Assembly specification
 
 1. Create Figma pages: `01 — Baseline`, `02 — Desktop`, `03 — Mobile`, `04 — Components`, `05 — Interaction notes`.
 2. Place current original screenshots alongside the equivalent redesign state using the same transaction and account perspective.
 3. Use 1440 px desktop frames and 390 px mobile frames; inspect 375, 430, and 768 px behavior where practical.
-4. Recreate component groups if editability is needed: navigation, identity/status, perspective selector, MRI layer control, balance decomposition, token account card, graph node/legend, evidence record, inspector, address character tile.
-5. Link Impact → Connections → Evidence states and preserve the highlighted account. Add evidence-sheet open/closed states for mobile.
+4. Recreate component groups if editability is needed: navigation, identity/status, perspective selector, Anatomy depth control, balance decomposition, token account card, graph node/legend, evidence record, inspector, address character tile.
+5. Link Outcome → Structure → Proof states and preserve the selected financial outcome and account. Add evidence-sheet open/closed states for mobile.
 6. Annotate the concrete user problem, the intended improvement, and the exact supporting record. Use your own submission explanation.
 
 ## Design tokens
@@ -42,7 +44,7 @@ The end-to-end suite also saves `failure-desktop.png`, `failure-mobile.png`, and
 - Canvas `#F6F5F0`; surface white; primary action `#007E72`; outgoing `#AD6239`; failure `#B64642`.
 - Body: Manrope; headline emphasis: Georgia italic; financial/identifier text: DM Mono.
 - Desktop content max width: 1440 px with 64 px padding; tablet 36 px; mobile 22 px.
-- MRI desktop layout: flexible canvas + 293–320 px inspector; gap 21 px.
+- Anatomy desktop layout: flexible canvas + 230–320 px inspector inside one continuous workbench.
 - Borders: 1 px; panel radii: 8–10 px; mobile sheet: 18 px top corners.
 - Motion: 150–250 ms; no motion for reduced-motion preferences.
 

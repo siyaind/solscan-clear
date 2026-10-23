@@ -8,8 +8,6 @@ import {
   ArrowLeft,
   ChevronRight,
   Check,
-  Layers3,
-  GitBranch,
   Braces,
   ChevronDown,
   CircleAlert,
@@ -22,9 +20,9 @@ import { normalize, transactionSummary } from "@/lib/normalize";
 import { syntheticTransfer } from "@/lib/synthetic";
 import type { Layer, Transaction } from "@/lib/model";
 import { Classification, CopyButton, ErrorState, Loading } from "./ui";
-import { ImpactCanvas } from "./impact-canvas";
-import { RelationshipCanvas } from "./relationship-canvas";
-import { EvidenceView, EvidenceInspector } from "./evidence-inspector";
+import { AnatomyStage } from "./anatomy-stage";
+import { anatomyOutcomes } from "@/lib/anatomy";
+import { EvidenceInspector } from "./evidence-inspector";
 import { ResponsiveInspector } from "./responsive-inspector";
 import {
   readViewState,
@@ -42,9 +40,9 @@ export function TransactionWorkspace({ signature }: { signature: string }) {
   const [layer, setLayer] = useState<Layer>("impact");
   const [perspective, setPerspective] = useState("");
   const [selection, setSelection] = useState("account:0");
+  const [subject, setSubject] = useState("account:0");
   const [sheetOpen, setSheetOpen] = useState(false);
   const [fullSignature, setFullSignature] = useState(false);
-  const [chapter, setChapter] = useState(0);
   const closeSheet = useCallback(() => setSheetOpen(false), []);
   useEffect(() => {
     const controller = new AbortController();
@@ -107,9 +105,9 @@ export function TransactionWorkspace({ signature }: { signature: string }) {
         setTx(transaction);
         setPerspective(saved.perspective);
         setSelection(saved.selection);
+        setSubject(saved.subject);
         setLayer(saved.layer);
         setSheetOpen(false);
-        setChapter(0);
         setFullSignature(false);
       } catch (caught) {
         if (!controller.signal.aborted)
@@ -132,6 +130,7 @@ export function TransactionWorkspace({ signature }: { signature: string }) {
       setLayer(saved.layer);
       setPerspective(saved.perspective);
       setSelection(saved.selection);
+      setSubject(saved.subject);
       closeSheet();
     };
     window.addEventListener("popstate", restore);
@@ -139,10 +138,11 @@ export function TransactionWorkspace({ signature }: { signature: string }) {
   }, [tx, closeSheet]);
 
   function updateContext(patch: Partial<ViewState>) {
-    const next = { layer, perspective, selection, ...patch };
+    const next = { layer, perspective, selection, subject, ...patch };
     setLayer(next.layer);
     setPerspective(next.perspective);
     setSelection(next.selection);
+    setSubject(next.subject);
     window.history.replaceState(
       null,
       "",
@@ -153,11 +153,22 @@ export function TransactionWorkspace({ signature }: { signature: string }) {
     updateContext({ layer: next });
   }
   function select(id: string) {
-    updateContext({ selection: id });
+    const asset =
+      tx && anatomyOutcomes(tx, perspective).find((a) => a.evidenceId === id);
+    updateContext({ selection: id, ...(asset ? { subject: id } : {}) });
+  }
+  function changePerspective(address: string) {
+    if (!tx) return;
+    const next = anatomyOutcomes(tx, address)[0]?.evidenceId ?? "status";
+    updateContext({ perspective: address, subject: next, selection: next });
   }
   function showEvidence(id: string) {
     updateContext({ selection: id, layer: "evidence" });
-    setSheetOpen(true);
+    requestAnimationFrame(() =>
+      document
+        .getElementById("anatomy-proof")
+        ?.scrollIntoView({ block: "start" }),
+    );
   }
   if (error)
     return (
@@ -171,7 +182,6 @@ export function TransactionWorkspace({ signature }: { signature: string }) {
         <Loading />
       </div>
     );
-  const account = tx.accounts.find((a) => a.address === perspective);
   const selected = tx.evidence.find((e) => e.id === selection);
   const synthetic = tx.source.kind === "synthetic";
   const title =
@@ -187,6 +197,7 @@ export function TransactionWorkspace({ signature }: { signature: string }) {
   const perspectives = tx.accounts.filter(
     (a) =>
       a.signer ||
+      a.address === perspective ||
       (a.delta !== null && a.delta !== "0") ||
       tx.assets.some(
         (b) => !b.native && (b.account === a.address || b.owner === a.address),
@@ -203,57 +214,6 @@ export function TransactionWorkspace({ signature }: { signature: string }) {
           timeZone: "UTC",
         }) + " UTC"
       : "Time unavailable";
-  const layers: {
-    id: Layer;
-    number: string;
-    title: string;
-    question: string;
-    icon: typeof Layers3;
-  }[] = [
-    {
-      id: "impact",
-      number: "01",
-      title: "Impact",
-      question: "What changed?",
-      icon: Layers3,
-    },
-    {
-      id: "connections",
-      number: "02",
-      title: "Connections",
-      question: "How is it connected?",
-      icon: GitBranch,
-    },
-    {
-      id: "evidence",
-      number: "03",
-      title: "Evidence",
-      question: "How can I verify it?",
-      icon: Braces,
-    },
-  ];
-  function chooseChapter(index: number) {
-    setChapter(index);
-    if (index === 0) {
-      select(account?.evidenceId ?? "account:0");
-    }
-    if (index === 1) {
-      updateContext({
-        layer: "connections",
-        selection: tx?.instructions[0]?.evidenceId ?? "status",
-      });
-    }
-    if (index === 2) {
-      updateContext({
-        layer: "impact",
-        selection: account?.evidenceId ?? "account:0",
-      });
-    }
-    if (index === 3) {
-      select("fee");
-    }
-  }
-
   return (
     <div className="transaction-page page-container">
       <div className="transaction-breadcrumb">
@@ -262,7 +222,7 @@ export function TransactionWorkspace({ signature }: { signature: string }) {
           Explorer
         </Link>
         <ChevronRight size={12} />
-        <span>Transaction MRI</span>
+        <span>Transaction Anatomy</span>
         <span className={`source-label ${synthetic ? "synthetic" : ""}`}>
           <span />
           {tx.source.label}
@@ -337,15 +297,7 @@ export function TransactionWorkspace({ signature }: { signature: string }) {
                 id="perspective"
                 aria-label="Viewing impact for"
                 value={perspective}
-                onChange={(e) => {
-                  const next = tx.accounts.find(
-                    (a) => a.address === e.target.value,
-                  )!;
-                  updateContext({
-                    perspective: next.address,
-                    selection: next.evidenceId,
-                  });
-                }}
+                onChange={(e) => changePerspective(e.target.value)}
               >
                 {perspectives.map((a) => (
                   <option key={a.id} value={a.address}>
@@ -400,51 +352,6 @@ export function TransactionWorkspace({ signature }: { signature: string }) {
           )}
         </div>
       </div>
-      <div
-        className="mri-controls"
-        role="tablist"
-        aria-label="Transaction MRI layers"
-      >
-        {layers.map((item) => (
-          <button
-            key={item.id}
-            id={`tab-${item.id}`}
-            role="tab"
-            aria-controls="mri-panel"
-            aria-selected={layer === item.id}
-            tabIndex={layer === item.id ? 0 : -1}
-            onClick={() => changeLayer(item.id)}
-            onKeyDown={(event) => {
-              if (
-                !["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)
-              )
-                return;
-              event.preventDefault();
-              const index = layers.findIndex((entry) => entry.id === item.id);
-              const nextIndex =
-                event.key === "Home"
-                  ? 0
-                  : event.key === "End"
-                    ? layers.length - 1
-                    : (index +
-                        (event.key === "ArrowRight" ? 1 : -1) +
-                        layers.length) %
-                      layers.length;
-              changeLayer(layers[nextIndex].id);
-              document.getElementById(`tab-${layers[nextIndex].id}`)?.focus();
-            }}
-            className={`mri-tab ${layer === item.id ? "selected" : ""}`}
-          >
-            <span className="layer-number">{item.number}</span>
-            <item.icon size={19} />
-            <span>
-              <strong>{item.title}</strong>
-              <small>{item.question}</small>
-            </span>
-            <ArrowUpRight className="tab-arrow" size={16} />
-          </button>
-        ))}
-      </div>
       {tx.execution !== "success" && (
         <div className={`outcome-notice ${tx.execution}`}>
           <CircleAlert size={20} />
@@ -465,55 +372,32 @@ export function TransactionWorkspace({ signature }: { signature: string }) {
           </button>
         </div>
       )}
-      <div className="mri-layout">
-        <div
-          className="mri-main"
-          role="tabpanel"
-          id="mri-panel"
-          aria-labelledby={`tab-${layer}`}
-          key={layer}
-        >
-          {layer === "impact" && (
-            <ImpactCanvas
+      <AnatomyStage
+        tx={tx}
+        perspective={perspective}
+        subject={subject}
+        selection={selection}
+        layer={layer}
+        onLayer={changeLayer}
+        onSubject={(id) => updateContext({ subject: id, selection: id })}
+        onSelect={select}
+        onEvidence={showEvidence}
+        onPerspective={changePerspective}
+        inspector={
+          <ResponsiveInspector open={sheetOpen} onClose={closeSheet}>
+            <EvidenceInspector
               tx={tx}
-              perspective={perspective}
-              selection={selection}
-              onSelect={select}
-              onEvidence={showEvidence}
-            />
-          )}
-          {layer === "connections" && (
-            <RelationshipCanvas
-              tx={tx}
-              perspective={perspective}
-              selection={selection}
-              onSelect={select}
-              onEvidence={showEvidence}
-              chapter={chapter}
-            />
-          )}
-          {layer === "evidence" && (
-            <EvidenceView
-              tx={tx}
-              selection={selection}
-              onSelect={(id) => {
-                select(id);
-                setSheetOpen(true);
+              evidence={selected}
+              layer={layer}
+              onEvidence={() => {
+                closeSheet();
+                showEvidence(selection);
               }}
-              perspective={perspective}
+              onClose={closeSheet}
             />
-          )}
-        </div>
-        <ResponsiveInspector open={sheetOpen} onClose={closeSheet}>
-          <EvidenceInspector
-            tx={tx}
-            evidence={selected}
-            layer={layer}
-            onEvidence={() => changeLayer("evidence")}
-            onClose={closeSheet}
-          />
-        </ResponsiveInspector>
-      </div>
+          </ResponsiveInspector>
+        }
+      />
       <div className="mobile-inspect">
         <button
           id="mobile-inspect-trigger"
@@ -524,30 +408,6 @@ export function TransactionWorkspace({ signature }: { signature: string }) {
           Inspect selected evidence <ArrowUpRight size={15} />
         </button>
       </div>
-      <section className="storyboard" aria-label="Logical explanation chapters">
-        <div className="story-label">
-          <span className="eyebrow">FOLLOW THE STORY</span>
-          <p>Logical chapters, one atomic transaction.</p>
-        </div>
-        <div className="story-steps">
-          {[
-            "The request",
-            "Program interactions",
-            "The result",
-            "Fees & outcome",
-          ].map((title, i) => (
-            <button
-              className={chapter === i ? "active" : ""}
-              key={title}
-              onClick={() => chooseChapter(i)}
-            >
-              <span>0{i + 1}</span>
-              {title}
-              <ChevronRight size={13} />
-            </button>
-          ))}
-        </div>
-      </section>
       <div className="transaction-footnote">
         <p>
           <span className="status-dot" />
@@ -562,10 +422,12 @@ export function TransactionWorkspace({ signature }: { signature: string }) {
           onClick={() => {
             updateContext({
               layer: "impact",
-              selection: "account:0",
+              selection:
+                anatomyOutcomes(tx, tx.feePayer)[0]?.evidenceId ?? "status",
+              subject:
+                anatomyOutcomes(tx, tx.feePayer)[0]?.evidenceId ?? "status",
               perspective: tx.feePayer,
             });
-            setChapter(0);
           }}
         >
           <RotateCcw size={12} />

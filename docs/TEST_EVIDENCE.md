@@ -4,14 +4,14 @@ Verified locally on **23 October 2026**, on Windows with Node.js 24.18, Next.js 
 
 ## Completed checks
 
-The deep audit and its fixes are documented in [AUDIT_AND_IMPROVEMENTS.md](AUDIT_AND_IMPROVEMENTS.md). The expanded suite covers 82 unit/regression cases and 26 browser cases, including the preserved transaction corpus and automated accessibility checks. GitHub CI is an additional verification step; local success does not imply a hosted run has finished.
+The deep audit and its fixes are documented in [AUDIT_AND_IMPROVEMENTS.md](AUDIT_AND_IMPROVEMENTS.md). The Transaction Anatomy suite covers 119 unit/regression cases and 38 browser cases, including the preserved transaction corpus and automated accessibility checks. GitHub CI is an additional verification step; local success does not imply a hosted run has finished.
 
 | Check                         | Observed result                                                                                                                |
 | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
 | TypeScript                    | Passed, including Next.js production type generation                                                                           |
 | ESLint                        | Passed                                                                                                                         |
-| Unit/regression suite         | 82 tests passed, including all 22 preserved mainnet captures                                                                   |
-| End-to-end suite              | 26 tests passed, thirteen cases each at 1440 × 1000 and 390 × 844                                                              |
+| Unit/regression suite         | 119 tests passed, including all 22 preserved mainnet captures                                                                  |
+| End-to-end suite              | 38 tests passed, nineteen cases each at 1440 × 1000 and 390 × 844                                                              |
 | Production build              | Passed; all ten routes generated as appropriate static/dynamic routes                                                          |
 | Actual live transaction fetch | Passed through the server-side proxy, independently of fixture loading                                                         |
 | Source integrity              | Raw mainnet JSON retained with signature/network/capture-time manifest; baseline normalized fields in `fixtures-expected.json` |
@@ -20,7 +20,7 @@ Final formatting, lint, and regression checks are rerun after any subsequent imp
 
 ## Accounting coverage
 
-The final audit run passed all **82 unit/regression tests** and **26 desktop/mobile browser tests**. Axe reported no WCAG A/AA violations on the tested home, transaction, and comparison screens at the two viewport sizes. `npm audit --omit=dev` reported **zero known production dependency vulnerabilities**. These scoped automated results do not constitute a security or exhaustive accessibility certification. Type checks now generate Next route types explicitly, so a fresh checkout does not depend on this machine’s ignored generated files.
+The Transaction Anatomy run passed all **119 unit/regression tests** and **38 desktop/mobile browser tests**. Axe reported no WCAG A/AA violations on the tested home, transaction, and comparison screens at the two viewport sizes. `npm audit --omit=dev` reported **zero known production dependency vulnerabilities**. These scoped automated results do not constitute a security or exhaustive accessibility certification. Type checks now generate Next route types explicitly, so a fresh checkout does not depend on this machine’s ignored generated files.
 
 Audit additions include text/memo instructions; omitted metadata and null lookup data; ambiguous and changing token owners; Token-2022 instruction fees; nested CPI callers; failure-log ambiguity; exact JSON-RPC envelope/response IDs and response-size limits; independent transaction/finality failures; partial account-history availability; and URL context round-tripping. Browser additions cover share/reload continuity, token versus SOL inspector units, full mobile keyboard focus handling, history pagination, appearance persistence, prefilled comparison, wrong-network rejection, and axe checks of home, transaction, and comparison screens on both viewport sizes.
 
@@ -28,9 +28,17 @@ Tests cover exact lamport and token formatting, unsafe JSON integer preservation
 
 For every preserved mainnet record, tests check the signature, execution result, fee, account count, and fee-payer delta against a saved baseline. They also verify that each visualized asset/instruction/relationship points to an existing evidence ID, and that reconciliation components sum exactly to the account’s delta. Failed records must have no committed movement edges.
 
+## Transaction Anatomy coverage
+
+The 37 additional unit cases cover exact cumulative waterfall amounts, tiny fee attribution, recipient perspective, residuals, failed execution, missing metadata, Token-2022 net-versus-instruction amounts, integers beyond JavaScript's safe range, separate same-mint token accounts, contextual graph selection (including a dense repeated-dependency regression), and subject/evidence URL continuity. Every asset in all 22 captures is checked for exact bridge arithmetic and resolvable supporting evidence.
+
+Six additional browser scenarios run on both desktop and mobile. They check that the same outcome DOM element remains mounted across depth changes; a token outcome survives inspecting unrelated instruction proof and reloading; switching perspective from a graph node recomputes the result; selecting a program opens its instruction cluster; unknown balances stay explicit; and tiny fees remain readable without page overflow at 320 px. Automated WCAG A/AA checks exercise all three depths in light and dark themes with reduced motion, including the expanded complete-record browser.
+
+The new scans found and corrected accessible-name mismatches in waterfall buttons and existing graph controls/nodes. Visual review widened mobile outcome cards and waterfall columns to keep ordinary transaction amounts readable. Horizontal scrolling is confined to the outcome rail and chart. These are scoped automated and emulated-device checks, not a physical-device usability study.
+
 ## End-to-end coverage
 
-The browser suite checks homepage intent/search validation; recorded-example loading; Impact → Connections → Evidence navigation; keyboard layer navigation; account selection retained between layers; wallet perspective retained when returning to Impact; graph expand/zoom/fit; failed-execution fee and missing transfer arrows; complete-address equality and differing characters; exact clipboard contents; raw RPC JSON; light/dark theme switching; mobile evidence sheet open/close; invalid live signature validation; and horizontal page overflow for home, Impact, Connections, Evidence, Compare, and failure screens.
+The browser suite checks homepage intent/search validation; recorded-example loading; Outcome → Structure → Proof navigation; keyboard depth navigation; account selection retained between layers; wallet perspective retained when returning to Outcome; graph expand/zoom/fit; failed-execution fee and missing transfer arrows; complete-address equality and differing characters; exact clipboard contents; raw RPC JSON; light/dark theme switching; mobile evidence sheet open/close; invalid live signature validation; and horizontal page overflow for home, Outcome, Structure, Proof, Compare, and failure screens.
 
 The browser suite uses preserved or explicitly synthetic fixtures for deterministic behavior. It does not depend on a live RPC provider for its passing result.
 
@@ -44,13 +52,15 @@ Observed response: `source.kind = live`, execution `success`, finality `finalize
 
 ## Visual verification
 
+Transaction Anatomy outcome, structure, and inline proof screens were reviewed at desktop and mobile widths. The `anatomy-outcome-*` and `anatomy-proof-*` screenshots show the explicitly synthetic transfer; the existing `impact-*`, `connections-*`, and `evidence-*` filenames now capture the redesigned recorded-mainnet journey.
+
 Desktop and mobile Impact/Evidence/Connections captures were visually reviewed for hierarchy, graph legibility, long-identifier wrapping, amount readability, and overflow. The graph’s initial node selection was refined to prioritize application programs and token counterparties. Screenshots are under `docs/screenshots/`, with original Solscan before screens clearly distinguished by their `original-` prefix. Mobile uses a vertical account view and a separate evidence sheet, rather than shrinking the desktop graph.
 
 ## Hosted CI status
 
 The [initial GitHub Actions run](https://github.com/rishu4436/solscan-clear/actions/runs/39938825952) in the previous repository stopped before any workflow step executed because of an account billing/spending-limit restriction. That run did not execute code tests. Billing settings were not changed.
 
-The project now uses the private [siyaind/solscan-clear repository](https://github.com/siyaind/solscan-clear). Hosted checks started under this account. Its first run exposed reduced text contrast during the mobile panel's entry fade; the panel now keeps full opacity while sliding into place. The existing WCAG checks passed three consecutive scans at each viewport locally after this fix. Current hosted results are available in [GitHub Actions](https://github.com/siyaind/solscan-clear/actions).
+The project now uses the public [siyaind/solscan-clear repository](https://github.com/siyaind/solscan-clear). Hosted checks started under this account. Its first run exposed reduced text contrast during the mobile panel's entry fade; the panel now keeps full opacity while sliding into place. The existing WCAG checks passed three consecutive scans at each viewport locally after this fix. Current hosted results are available in [GitHub Actions](https://github.com/siyaind/solscan-clear/actions).
 
 ## Reproduce locally
 

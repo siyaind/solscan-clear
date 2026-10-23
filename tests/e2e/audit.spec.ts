@@ -36,6 +36,9 @@ test("deep links restore instruction evidence and wallet perspective", async ({
   await page.goto(
     `/tx/demo-swap-success-6?layer=evidence&account=${payer}&focus=ix%3A0`,
   );
+  await page
+    .getByText("Browse the complete transaction record", { exact: true })
+    .click();
   await expect(
     page.getByRole("tab", { name: "Instructions", exact: true }),
   ).toHaveAttribute("aria-selected", "true");
@@ -50,6 +53,9 @@ test("deep links restore instruction evidence and wallet perspective", async ({
   const link = await page.evaluate(() => navigator.clipboard.readText());
   expect(new URL(link).searchParams.get("focus")).toBe("ix:0");
   await page.reload();
+  await page
+    .getByText("Browse the complete transaction record", { exact: true })
+    .click();
   await expect(
     page.getByRole("tab", { name: "Instructions", exact: true }),
   ).toHaveAttribute("aria-selected", "true");

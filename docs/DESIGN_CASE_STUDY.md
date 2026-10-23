@@ -12,23 +12,25 @@ Reference: [Solscan TX Map](https://docs.solscan.io/transaction-details/transact
 
 ## Three redesigned workflows
 
-### 1. Transaction MRI
+### 1. Transaction Anatomy
 
-The central feature is one transaction viewed through three layers, with the selected account and evidence retained.
+The central feature is a persistent financial outcome that opens progressively. The outcome card remains mounted while the user moves through Outcome, Structure, and Proof using labeled buttons or a keyboard-operable depth slider. Account perspective, outcome identity, and selected evidence are separate state: inspecting a fee or instruction does not replace the token balance being investigated. All four values survive sharing and reload.
 
-**Impact — “What changed?”**
+**Outcome — “What changed?”**
 
-The native balance sits before a decomposition of the difference. Fees, supported System transfers, account funding, and unknown remainders are separate selectable components. Token-account balances sit below, with exact decimals and before/after amounts. The layout separates observed facts from explanations. “Not fully explained” is a useful answer when a close-account refund or unfamiliar protocol cannot be fully interpreted.
+Select a native or individual token-account outcome, then inspect its cumulative balance waterfall and exact component ledger. Native fees, supported System transfers, account funding, and unknown remainders open their supporting records. Tiny fees retain a minimum-height marker with the exact amount beside it; monetary arithmetic remains integer-based. Token outcomes show recorded net changes rather than reconstructing receipt from gross instructions. Unknown balances do not produce a fabricated chart, and an arithmetically reconciled residual is still labeled unexplained.
 
-**Connections — “How are the entities related?”**
+For the labeled synthetic transfer, the sender's 2 SOL becomes 1.749995 SOL after a 0.25 SOL transfer and 0.000005 SOL fee. Switching to the recipient independently shows 1 SOL becoming 1.25 SOL, with no payer fee attributed to that account. This is an accounting decomposition, not an instruction timeline.
 
-A focused metro-style dependency diagram uses three line styles: solid asset movement, dashed program invocation, and dotted account references. It initially shows a handful of relevant addresses. Expansion, pan, zoom, fit, the complete relationship list, and the account directory offer deeper investigation without a 57-node tangle. On mobile, selectable nodes become a vertical account directory; exact relationships remain in the text view. Physical vertical order is not presented as execution sequence.
+**Structure — “How are the entities related?”**
 
-**Evidence — “How can I verify it?”**
+A focused metro-style dependency diagram uses three line styles: solid asset movement, dashed program invocation, and dotted account references. It ranks actual dependencies around the selected outcome, perspective, and evidence, initially showing up to seven accounts and expanding to twelve. Selecting a program exposes its recorded instructions; selecting a counterparty offers a direct perspective switch. The persistent outcome stays above, and its balance breakdown can reopen beside the map. Pan, zoom, fit, the complete relationship list, and the account directory remain available. On mobile, selectable nodes become a vertical account directory; physical vertical order is not presented as execution sequence.
 
-The record browser exposes balances, instructions, inner traces, logs, and raw JSON. Each selected record has an exact field reference and classification. Direct balance evidence is “Verified on-chain,” server parser output is “Parsed interpretation,” and unsupported semantics are “Not determined.” Synthetic example records are labeled synthetic rather than on-chain verified.
+**Proof — “How can I verify it?”**
 
-The inspector stays visible on desktop. On mobile, the user explicitly opens an evidence sheet; the page keeps the essential status and fee visible without opening it.
+The selected detail opens inline into its exact field reference and underlying JSON while retaining the outcome and structure. The complete record browser is available through an additional disclosure for balances, instructions, inner traces, logs, and raw JSON. Direct balance evidence is “Verified on-chain,” server parser output is “Parsed interpretation,” and unsupported semantics are “Not determined.” Synthetic example records are labeled synthetic rather than on-chain verified.
+
+The inspector stays visible on desktop. On mobile, proof opens inline and the full inspector remains an explicitly opened keyboard-safe sheet. These changes develop the existing TX Map workflow through persistent context and progressive disclosure; they do not claim that transaction maps themselves are new.
 
 ### 2. Question-first exploration
 

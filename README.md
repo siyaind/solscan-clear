@@ -2,7 +2,7 @@
 
 **See what happened. Understand why. Verify everything.**
 
-A working, read-only Solscan redesign for the Superteam India design bounty. Transaction MRI keeps three perspectives on a single normalized transaction in sync: **Impact**, **Connections**, and **Evidence**. Warm paper, precise typography, and restrained teal give the financial reconciliation room to breathe.
+A working, read-only Solscan redesign for the Superteam India design bounty. **Transaction Anatomy** keeps one selected financial outcome visible as you unfold **Outcome → Structure → Proof**. An exact balance waterfall, adaptive relationship map, and inline source records share the same account perspective. Warm paper, precise typography, and restrained teal give the financial reconciliation room to breathe.
 
 ## Run locally
 
@@ -28,7 +28,7 @@ No wallet, seed phrase, signing key, authentication, or paid parsing service is 
 ## Explore
 
 - `/` — question-first search, deterministic example journeys, and recorded examples.
-- `/tx/[signature]` — live mainnet Transaction MRI. Invalid/missing/pending/unavailable states remain distinct; no mock fallback.
+- `/tx/[signature]` — live mainnet Transaction Anatomy. Invalid/missing/pending/unavailable states remain distinct; no mock fallback.
 - `/tx/demo-swap-success-6` — recorded mainnet example, with provenance and download.
 - `/tx/demo-token-success-12` — recorded token transaction with separate SOL fee.
 - `/tx/demo-transfer-failed-9` — recorded failed execution, charged fee, and rolled-back requests.
@@ -44,7 +44,7 @@ The example selector switches among the six demonstration journeys. `/fixtures/m
 
 ## Architecture
 
-The audit added shareable investigation links (`layer`, `account`, `focus`), automatic selection of the relevant evidence category, token-unit inspection, explorer URL pasting with network checks, persistent theme preference, and a keyboard-safe mobile dialog. Read the [technical audit and improvements](docs/AUDIT_AND_IMPROVEMENTS.md) for the defects found and the reasoning behind each correction.
+Shareable investigation links retain depth (`layer`), perspective (`account`), selected evidence (`focus`), and the financial outcome (`asset`) independently. Legacy links still work. The audit also added token-unit inspection, explorer URL pasting with network checks, persistent theme preference, and a keyboard-safe mobile dialog. Read the [technical audit and improvements](docs/AUDIT_AND_IMPROVEMENTS.md) for the earlier corrections.
 
 Next.js App Router, React, strict TypeScript, Zod runtime validation, Lucide icons, local Manrope/DM Mono fonts, and CSS/SVG visualizations. The application uses a typed JSON-RPC adapter instead of a wallet SDK; it never signs or broadcasts. CSS transitions honor reduced-motion preferences.
 
@@ -53,13 +53,15 @@ app/api/transactions/[signature]   validation → server RPC → normalize → b
 lib/format.ts                     base58 validation, exact JSON integers, decimal formatting
 lib/model.ts                      RPC schemas and shared domain/evidence types
 lib/normalize.ts                  balances, traces, relationships, reconciliation
-components/transaction-workspace  shared perspective, selection, layer, and chapters
-components/impact-canvas          balance delta and exact decomposition
+lib/anatomy.ts                    exact accounting bridge and contextual relationship ranking
+components/transaction-workspace  shared perspective, outcome, evidence, and depth
+components/anatomy-stage          persistent outcome and progressive structure/proof disclosure
+components/impact-canvas          cumulative balance waterfall and exact component ledger
 components/relationship-canvas    typed edges, focused nodes, pan/zoom, text alternative
 components/evidence-inspector     balances, instructions, logs, raw JSON, source references
 ```
 
-All visualization selections reference evidence IDs in the shared transaction. Wallet changes update the same model's perspective; moving between layers retains the selected evidence. Native balances, token balances, and wrapped SOL remain separate. Multiple token accounts of one mint are not silently merged.
+All visualization selections reference evidence IDs in the shared transaction. Changing perspective recomputes its outcomes independently; moving between depths retains the selected outcome and evidence. Native balances, token balances, and wrapped SOL remain separate. Multiple token accounts of one mint are not silently merged. Token waterfalls show recorded net changes, never an inferred receipt from gross instruction amounts. Native components keep fees, transfers, account funding, and unexplained residuals distinct; the chart is an accounting breakdown, not execution order.
 
 Integer RPC lexemes beyond JavaScript's safe range are preserved as strings using Node's JSON reviver source context. Arithmetic uses `BigInt`; API responses use decimal integer strings. No floating-point monetary reconciliation or token pricing is used. No network requests are made directly from the browser to the RPC provider.
 
@@ -77,7 +79,7 @@ npm run build
 npm run start
 ```
 
-End-to-end tests use the locally installed Microsoft Edge browser at 1440 × 1000 and 390 × 844. Set `PLAYWRIGHT_CHANNEL=chrome` for another installed Chromium browser, or use the bundled Chromium engine in CI. Tests exercise the MRI journey, graph controls, saved context, token-unit inspection, failure regressions, raw JSON, clipboard, theme persistence, history pagination, mobile focus handling, address comparison, invalid live lookups, page overflow, and automated WCAG A/AA checks. Screenshots are written to `docs/screenshots/`. The GitHub Actions workflow uses Node 24 and installs Playwright Chromium before running the same checks and production build.
+End-to-end tests use the locally installed Microsoft Edge browser at 1440 × 1000 and 390 × 844. Set `PLAYWRIGHT_CHANNEL=chrome` for another installed Chromium browser, or use the bundled Chromium engine in CI. Tests exercise the persistent Anatomy journey, graph controls, saved context, token-unit inspection, failure regressions, raw JSON, clipboard, theme persistence, history pagination, mobile focus handling, address comparison, invalid live lookups, page overflow, and automated WCAG A/AA checks. Screenshots are written to `docs/screenshots/`. The GitHub Actions workflow uses Node 24 and installs Playwright Chromium before running the same checks and production build.
 
 To refresh public recorded fixtures, run `npm run capture`. The script only performs public mainnet reads; it tries the official endpoint and PublicNode. Review the new manifest and update the example IDs if they change. Keep the original raw response text to preserve integer evidence. Expected baseline values are in `docs/fixtures-expected.json`.
 
@@ -92,7 +94,7 @@ This is a standard server-rendered Next.js application. Run `npm run build` then
 - Finalization does not imply execution success. Failed transactions do not show committed transfer edges. Fees and recorded balance effects remain visible, including durable nonce caveats.
 - Missing balance metadata does not become a zero balance. New/closed token-account sides become zero only when both token balance lists are present.
 - Unknown ownership is not guessed. Accounts created and closed within one transaction with no balance metadata may have instruction evidence only.
-- Program labels are a small, static address registry. This is not a universal protocol or swap decoder. The graph focuses on up to nine nodes; every account and relationship remains available in the text/evidence views.
+- Program labels are a small, static address registry. This is not a universal protocol or swap decoder. The graph ranks accounts around the selected outcome and evidence, showing up to seven nodes initially and twelve when expanded; every account and relationship remains available in the text/evidence views.
 - The Figma competition requirement still requires a real Figma file with before/after desktop and mobile screens. Implementation screenshots and handoff specs are included; an actual Figma file has not been created.
 - No usability-study results, performance improvements, or security audit are claimed.
 

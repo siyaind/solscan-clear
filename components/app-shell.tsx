@@ -72,7 +72,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               className={pathname.startsWith("/tx") ? "active" : ""}
               href={defaultExample}
             >
-              Transaction MRI<span className="tiny-pill">NEW</span>
+              Transaction Anatomy<span className="tiny-pill">NEW</span>
             </Link>
             <Link
               className={pathname === "/compare" ? "active" : ""}

@@ -25,7 +25,7 @@ const questions = [
   {
     icon: ScanLine,
     title: "What happened in this transaction?",
-    detail: "One transaction. Three ways to understand it.",
+    detail: "See the outcome. Unfold the structure. Reveal the proof.",
     href: defaultExample,
   },
   {
@@ -77,7 +77,7 @@ export default function HomePage() {
         </div>
         <Link href={defaultExample} className="instrument-preview">
           <div className="preview-top">
-            <span className="eyebrow">TRANSACTION MRI</span>
+            <span className="eyebrow">TRANSACTION ANATOMY</span>
             <span className="preview-live">
               <span className="status-dot" />A NEW PERSPECTIVE
             </span>
@@ -85,7 +85,7 @@ export default function HomePage() {
           <div className="preview-title">
             One transaction.
             <br />
-            <em>The whole picture.</em>
+            <em>Open it up.</em>
           </div>
           <div className="lens-art" aria-hidden="true">
             <div className="lens-axis vertical" />
@@ -97,15 +97,15 @@ export default function HomePage() {
               <Layers3 size={35} />
             </div>
             <span className="lens-label label-one">
-              <span>01</span> Impact
+              <span>01</span> Outcome
               <ArrowDownLeft size={13} />
             </span>
             <span className="lens-label label-two">
-              <span>02</span> Connections
+              <span>02</span> Structure
               <MoveUpRight size={13} />
             </span>
             <span className="lens-label label-three">
-              <span>03</span> Evidence
+              <span>03</span> Proof
               <Braces size={13} />
             </span>
             <span className="lens-tick tick-one" />

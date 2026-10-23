@@ -13,30 +13,27 @@ import {
   Box,
   CircleDot,
 } from "lucide-react";
-import {
-  PROGRAMS,
-  SYSTEM,
-  TOKEN,
-  TOKEN_2022,
-  type Transaction,
-} from "@/lib/model";
+import { PROGRAMS, type Transaction } from "@/lib/model";
+import { focusedRelationships } from "@/lib/anatomy";
 import { short, units } from "@/lib/format";
 import { Address } from "./ui";
 
 export function RelationshipCanvas({
   tx,
   perspective,
+  subject,
   selection,
   onSelect,
   onEvidence,
-  chapter,
+  onPerspective,
 }: {
   tx: Transaction;
   perspective: string;
+  subject: string;
   selection: string;
   onSelect: (id: string) => void;
   onEvidence: (id: string) => void;
-  chapter: number;
+  onPerspective: (address: string) => void;
 }) {
   const [expanded, setExpanded] = useState(false);
   const [zoom, setZoom] = useState(1);
@@ -45,62 +42,43 @@ export function RelationshipCanvas({
     null,
   );
   const selected = tx.evidence.find((e) => e.id === selection);
+  const focus = focusedRelationships(
+    tx,
+    perspective,
+    subject,
+    selection,
+    expanded,
+  );
   const nodes = useMemo(() => {
-    const allPrograms = [
-      ...new Set(tx.instructions.map((i) => i.program)),
-    ].filter((p) => p && !p.startsWith("ComputeBudget"));
-    const infrastructure = new Set([
-      SYSTEM,
-      TOKEN,
-      TOKEN_2022,
-      "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
-    ]);
-    const programs = [
-      ...allPrograms.filter((p) => !infrastructure.has(p)),
-      ...allPrograms.filter((p) => infrastructure.has(p)),
-    ];
-    const owned = tx.assets
-      .filter((a) => !a.native && a.owner === perspective)
-      .map((a) => a.account);
-    const relevantMovements = tx.relationships.filter(
-      (r) =>
-        r.kind === "movement" &&
-        ([perspective, ...owned].includes(r.from) ||
-          [perspective, ...owned].includes(r.to)),
+    const programs = [...new Set(tx.instructions.map((i) => i.program))];
+    const ranked = focusedRelationships(
+      tx,
+      perspective,
+      subject,
+      selection,
+      expanded,
     );
-    // Keep token counterparties in focus before fee-related transient funding accounts.
-    relevantMovements.sort(
-      (a, b) =>
-        Number(owned.includes(b.from) || owned.includes(b.to)) -
-        Number(owned.includes(a.from) || owned.includes(a.to)),
-    );
-    const related = relevantMovements.flatMap((r) => [r.from, r.to]);
     const addresses = [
-      ...new Set([
-        perspective,
-        ...owned.slice(0, expanded ? 3 : 1),
-        ...programs.slice(0, expanded ? 4 : 2),
-        ...related,
-        ...tx.accounts.filter((a) => a.delta !== "0").map((a) => a.address),
-      ]),
-    ]
-      .filter(Boolean)
-      .slice(0, expanded ? 9 : 5);
-    if (selected?.account && !addresses.includes(selected.account))
-      addresses[addresses.length - 1] = selected.account;
+      ranked.focus,
+      ...ranked.addresses.filter((address) => address !== ranked.focus),
+    ].filter((address) =>
+      tx.accounts.some((account) => account.address === address),
+    );
     const collapsedPositions = [
-      { x: 115, y: 205 },
-      { x: 370, y: 305 },
-      { x: 370, y: 85 },
-      { x: 630, y: 85 },
-      { x: 630, y: 305 },
+      { x: 380, y: 210 },
+      { x: 115, y: 85 },
+      { x: 645, y: 85 },
+      { x: 115, y: 210 },
+      { x: 645, y: 210 },
+      { x: 115, y: 335 },
+      { x: 645, y: 335 },
     ];
     return addresses.map((address, i) => {
       const account = tx.accounts.find((a) => a.address === address);
       const program = programs.includes(address);
       const token = tx.assets.find((a) => !a.native && a.account === address);
       const position = expanded
-        ? { x: 115 + (i % 3) * 255, y: 75 + Math.floor(i / 3) * 135 }
+        ? { x: 90 + (i % 4) * 193, y: 75 + Math.floor(i / 4) * 135 }
         : collapsedPositions[i];
       return {
         address,
@@ -122,7 +100,7 @@ export function RelationshipCanvas({
         ...position,
       };
     });
-  }, [tx, perspective, expanded, selected]);
+  }, [tx, perspective, subject, selection, expanded]);
   const addresses = nodes.map((n) => n.address);
   const edges = tx.relationships.filter(
     (r) => addresses.includes(r.from) && addresses.includes(r.to),
@@ -145,7 +123,7 @@ export function RelationshipCanvas({
       <section className="relationship-panel panel">
         <div className="panel-heading">
           <div>
-            <span className="eyebrow">02 / THE TRANSACTION METRO</span>
+            <span className="eyebrow">02 / ADAPTIVE TRANSACTION METRO</span>
             <h2>Follow the connections.</h2>
           </div>
           <GitBranch size={22} />
@@ -153,12 +131,13 @@ export function RelationshipCanvas({
         <p className="panel-description">
           {tx.execution === "failed"
             ? "Attempted dependencies, without successful transfer arrows."
-            : "Different lines tell different stories. A program call isn’t a transfer."}
+            : "A map built around your selected outcome and detail. Select a program to unfold its instructions."}
         </p>
         <div className="map-toolbar">
           <span>
             <span className="status-dot" />
-            {nodes.length} of {tx.accounts.length} accounts in focus
+            {nodes.length} accounts in focus · {focus.hidden} more relevant
+            accounts
           </span>
           <div>
             <button
@@ -171,11 +150,11 @@ export function RelationshipCanvas({
               }
             >
               <Expand size={13} />
-              {expanded ? "Collapse" : "Expand details"}
+              {expanded ? "Collapse graph details" : "Expand graph details"}
             </button>
             <button onClick={reset} aria-label="Fit graph to view">
               <Maximize2 size={14} />
-              Fit view
+              Fit graph to view
             </button>
           </div>
         </div>
@@ -256,8 +235,8 @@ export function RelationshipCanvas({
                   edge.evidenceId === selection ||
                   selected?.account === edge.from ||
                   selected?.account === edge.to ||
-                  (chapter === 1 && edge.kind === "invocation") ||
-                  (chapter === 2 && edge.kind === "movement");
+                  edge.from === focus.focus ||
+                  edge.to === focus.focus;
                 return (
                   <g
                     key={edge.id}
@@ -287,7 +266,7 @@ export function RelationshipCanvas({
                         ).length > 1
                           ? `${edges.filter((other) => other.from === edge.from && other.to === edge.to && other.kind === "movement").length} instructions · text view`
                           : edge.decimals !== undefined
-                            ? `${units(edge.amount!, edge.decimals)}${edge.amountBasis === "instruction" ? " requested" : " SOL"}`
+                            ? `${units(edge.amount!, edge.decimals)} ${edge.symbol ?? "SOL"}${edge.amountBasis === "instruction" ? " requested" : ""}`
                             : `${edge.amount} base units`}
                       </text>
                     )}
@@ -303,8 +282,8 @@ export function RelationshipCanvas({
                   top: `${(node.y / 420) * 100}%`,
                 }}
                 key={node.address}
+                data-address={node.address}
                 onClick={() => onSelect(node.evidenceId)}
-                aria-label={`Inspect ${node.label} ${short(node.address)}`}
               >
                 <span className="graph-node-icon">
                   {node.type === "wallet" ? (
@@ -349,6 +328,7 @@ export function RelationshipCanvas({
           {nodes.map((node, i) => (
             <button
               key={node.address}
+              data-address={node.address}
               className={selected?.account === node.address ? "selected" : ""}
               onClick={() => onSelect(node.evidenceId)}
             >
@@ -372,6 +352,46 @@ export function RelationshipCanvas({
             </button>
           ))}
         </div>
+        <div className="map-focus-detail">
+          <span className="small-label">MAP FOCUS</span>
+          <strong>{PROGRAMS[focus.focus] ?? short(focus.focus, 7)}</strong>
+          {focus.focus !== perspective &&
+            tx.accounts.some((a) => a.address === focus.focus) && (
+              <button
+                className="text-link"
+                onClick={() => {
+                  onPerspective(focus.focus);
+                  reset();
+                }}
+              >
+                View from this account <ArrowUpRight size={13} />
+              </button>
+            )}
+        </div>
+        {tx.instructions.some((ix) => ix.program === focus.focus) && (
+          <div
+            className="program-instructions"
+            role="region"
+            aria-label="Selected program instructions"
+          >
+            <p className="anatomy-note">
+              Recorded instructions for this program
+            </p>
+            {tx.instructions
+              .filter((ix) => ix.program === focus.focus)
+              .map((ix) => (
+                <button
+                  key={ix.id}
+                  className={selection === ix.evidenceId ? "selected" : ""}
+                  onClick={() => onSelect(ix.evidenceId)}
+                >
+                  <code>{ix.id}</code>
+                  <span>{ix.label}</span>
+                  <ArrowUpRight size={13} />
+                </button>
+              ))}
+          </div>
+        )}
         <div className="map-legend">
           <span>
             <i className="legend-line movement" />
@@ -387,9 +407,10 @@ export function RelationshipCanvas({
           </span>
         </div>
         <p className="map-caption">
-          A focused dependency view. Only supported transfers get asset movement
-          lines. Repeated endpoints share a line; every movement remains
-          separate in the text view below.
+          Accounts are ranked by the selected outcome, account, and program
+          dependencies. Only supported transfers get asset movement lines.
+          Repeated endpoints share a line; every movement remains separate in
+          the text view below.
         </p>
         <p className="movement-instruction-note">
           Token labels show instruction amounts, which can include a Token-2022
