@@ -289,7 +289,7 @@ export function ImpactCanvas({
       <div className="money-footnote">
         <p>
           {scale === "balance"
-            ? "Full balances share one proportional scale. Small changes use a labeled minimum marker."
+            ? "Full balances share one proportional scale. Tiny components may be subpixel; exact values remain in the ledger."
             : "Every component retains its exact recorded or parsed amount; unclassified residuals remain visible."}
         </p>
         <button

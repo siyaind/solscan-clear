@@ -254,6 +254,12 @@
 .waterfall-scroll-cue {
   display: none;
 }
+.waterfall-bar {
+  min-height: 0;
+}
+.mobile-relationship-paths {
+  display: none;
+}
 .case-study-entry {
   margin: 28px 0;
   padding: 30px;
@@ -294,6 +300,42 @@
   color: var(--muted);
 }
 @media (max-width: 700px) {
+  .mobile-relationship-paths {
+    display: grid;
+    gap: 8px;
+    margin: 16px 0;
+  }
+  .mobile-relationship-paths > p {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .mobile-relationship-paths details {
+    border: 1px solid var(--line);
+    padding: 12px;
+    border-radius: 6px;
+  }
+  .mobile-relationship-paths summary {
+    cursor: pointer;
+    font-size: 14px;
+  }
+  .mobile-relationship-paths summary small {
+    display: block;
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .mobile-relationship-paths details p {
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .mobile-relationship-paths button {
+    min-height: 44px;
+  }
+  .anatomy-structure .mobile-map-list {
+    max-height: 260px;
+    overflow-y: auto;
+  }
   .transaction-outcome-header {
     grid-template-columns: 1fr;
     gap: 15px;

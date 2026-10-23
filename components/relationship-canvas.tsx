@@ -370,6 +370,47 @@ export function RelationshipCanvas({
             </button>
           </div>
         </div>
+        <div
+          className="mobile-relationship-paths"
+          aria-label="Expandable relationship paths"
+        >
+          <p>Follow a recorded path</p>
+          {edges.length ? (
+            edges.map((edge) => (
+              <details key={edge.id}>
+                <summary>
+                  <span>
+                    {short(edge.from, 4)} → {short(edge.to, 4)}
+                  </span>
+                  <small>
+                    {edge.kind === "movement"
+                      ? "Asset movement"
+                      : edge.kind === "invocation"
+                        ? "Program invocation"
+                        : "Account reference"}
+                  </small>
+                </summary>
+                <p>
+                  {edge.label}
+                  {edge.attempted ? " · attempted, not committed" : ""}
+                </p>
+                <button
+                  className="text-link"
+                  onClick={() => onEvidence(edge.evidenceId)}
+                >
+                  Inspect supporting instruction <ArrowUpRight size={14} />
+                </button>
+              </details>
+            ))
+          ) : (
+            <p>
+              No supported{" "}
+              {mode === "money" ? "asset movements" : "relationships"} connect
+              these focused accounts. Try Full context or inspect the complete
+              records.
+            </p>
+          )}
+        </div>
         <div className="mobile-map-list">
           {visibleNodes.map((node, i) => (
             <button

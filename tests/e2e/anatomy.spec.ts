@@ -108,6 +108,18 @@ test("clicking a counterparty can change perspective and independently recompute
   page,
 }, info) => {
   await page.goto("/tx/demo-design-transfer?layer=connections");
+  if (info.project.name === "mobile") {
+    await page
+      .locator(".mobile-relationship-paths details summary")
+      .first()
+      .click();
+    await expect(
+      page
+        .locator(".mobile-relationship-paths")
+        .getByRole("button", { name: "Inspect supporting instruction" })
+        .first(),
+    ).toBeVisible();
+  }
   const nodes =
     info.project.name === "mobile" ? ".mobile-map-list" : ".graph-transform";
   await page
@@ -166,7 +178,7 @@ test("unknown balances remain explicit and tiny fees stay readable at narrow wid
   await expect(fee).toContainText("−0.000005");
   expect(
     (await fee.locator(".waterfall-bar").boundingBox())!.height,
-  ).toBeGreaterThanOrEqual(3);
+  ).toBeLessThan(3);
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= innerWidth,

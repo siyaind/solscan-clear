@@ -282,6 +282,8 @@ export function TransactionWorkspace({ signature }: { signature: string }) {
             These are net changes for the selected account and its attributable
             token accounts. A decrease and increase do not, by themselves, prove
             a swap or a recipient.
+            {perspective === tx.feePayer &&
+              " The network fee is already included in this account’s SOL net change."}
           </p>
         </div>
         <div className="outcome-header-effects">
