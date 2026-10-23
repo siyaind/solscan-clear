@@ -1,0 +1,81 @@
+/* Audit refinements: clearer secondary text and a keyboard-safe mobile inspector. */
+:root {
+  --muted: #53645d;
+  --orange: #96542c;
+}
+[data-theme="dark"] {
+  --muted: #a1b2aa;
+  --orange: #dfac82;
+}
+.sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: #14251f70;
+}
+.share-view {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 9px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.delta-direction.neutral {
+  background: var(--surface-soft);
+  color: var(--muted);
+}
+.tiny-pill,
+.classification.record {
+  color: var(--teal-dark);
+}
+.preview-live {
+  opacity: 1;
+  color: #42604e;
+}
+[data-theme="dark"] .preview-live {
+  color: #b6d9c9;
+}
+.lens-label > span {
+  color: #4a6845;
+}
+.example-card .small-label > span {
+  opacity: 1;
+}
+.inspector-number {
+  color: var(--muted);
+}
+.layer-number {
+  opacity: 1;
+}
+.execution-badge.success,
+.story-steps button.active > span,
+.mobile-inspect > .button {
+  color: var(--teal-dark);
+}
+.history-warning {
+  padding: 16px 20px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--orange-soft);
+  color: var(--orange);
+  font-size: 11px;
+  line-height: 1.9;
+  margin-bottom: 18px;
+}
+.movement-instruction-note {
+  font-size: 8px;
+  line-height: 1.8;
+  color: var(--muted);
+  margin-top: 10px;
+}
+@media (max-width: 700px) {
+  .share-view {
+    font-size: 7px;
+    gap: 2px;
+  }
+  .share-view .copy-button {
+    height: 24px;
+    width: 24px;
+  }
+}
