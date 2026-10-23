@@ -4,14 +4,14 @@ Verified locally on **23 October 2026**, on Windows with Node.js 24.18, Next.js 
 
 ## Completed checks
 
-The deep audit and its fixes are documented in [AUDIT_AND_IMPROVEMENTS.md](AUDIT_AND_IMPROVEMENTS.md). The Transaction Anatomy suite covers 119 unit/regression cases and 38 browser cases, including the preserved transaction corpus and automated accessibility checks. GitHub CI is an additional verification step; local success does not imply a hosted run has finished.
+The deep audit and its fixes are documented in [AUDIT_AND_IMPROVEMENTS.md](AUDIT_AND_IMPROVEMENTS.md). The Transaction Anatomy suite covers 119 unit/regression cases and 40 browser cases, including the preserved transaction corpus and automated accessibility checks. GitHub CI is an additional verification step; local success does not imply a hosted run has finished.
 
 | Check                         | Observed result                                                                                                                |
 | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
 | TypeScript                    | Passed, including Next.js production type generation                                                                           |
 | ESLint                        | Passed                                                                                                                         |
 | Unit/regression suite         | 119 tests passed, including all 22 preserved mainnet captures                                                                  |
-| End-to-end suite              | 38 tests passed, nineteen cases each at 1440 × 1000 and 390 × 844                                                              |
+| End-to-end suite              | 40 tests passed, twenty cases each at 1440 × 1000 and 390 × 844                                                                |
 | Production build              | Passed; all ten routes generated as appropriate static/dynamic routes                                                          |
 | Actual live transaction fetch | Passed through the server-side proxy, independently of fixture loading                                                         |
 | Source integrity              | Raw mainnet JSON retained with signature/network/capture-time manifest; baseline normalized fields in `fixtures-expected.json` |
@@ -20,7 +20,7 @@ Final formatting, lint, and regression checks are rerun after any subsequent imp
 
 ## Accounting coverage
 
-The Transaction Anatomy run passed all **119 unit/regression tests** and **38 desktop/mobile browser tests**. Axe reported no WCAG A/AA violations on the tested home, transaction, and comparison screens at the two viewport sizes. `npm audit --omit=dev` reported **zero known production dependency vulnerabilities**. These scoped automated results do not constitute a security or exhaustive accessibility certification. Type checks now generate Next route types explicitly, so a fresh checkout does not depend on this machine’s ignored generated files.
+The Transaction Anatomy run passed all **119 unit/regression tests** and **40 desktop/mobile browser tests**. Axe reported no WCAG A/AA violations on the tested home, transaction, and comparison screens at the two viewport sizes. `npm audit --omit=dev` reported **zero known production dependency vulnerabilities**. These scoped automated results do not constitute a security or exhaustive accessibility certification. Type checks now generate Next route types explicitly, so a fresh checkout does not depend on this machine’s ignored generated files.
 
 Audit additions include text/memo instructions; omitted metadata and null lookup data; ambiguous and changing token owners; Token-2022 instruction fees; nested CPI callers; failure-log ambiguity; exact JSON-RPC envelope/response IDs and response-size limits; independent transaction/finality failures; partial account-history availability; and URL context round-tripping. Browser additions cover share/reload continuity, token versus SOL inspector units, full mobile keyboard focus handling, history pagination, appearance persistence, prefilled comparison, wrong-network rejection, and axe checks of home, transaction, and comparison screens on both viewport sizes.
 
@@ -32,7 +32,7 @@ For every preserved mainnet record, tests check the signature, execution result,
 
 The 37 additional unit cases cover exact cumulative waterfall amounts, tiny fee attribution, recipient perspective, residuals, failed execution, missing metadata, Token-2022 net-versus-instruction amounts, integers beyond JavaScript's safe range, separate same-mint token accounts, contextual graph selection (including a dense repeated-dependency regression), and subject/evidence URL continuity. Every asset in all 22 captures is checked for exact bridge arithmetic and resolvable supporting evidence.
 
-Six additional browser scenarios run on both desktop and mobile. They check that the same outcome DOM element remains mounted across depth changes; a token outcome survives inspecting unrelated instruction proof and reloading; switching perspective from a graph node recomputes the result; selecting a program opens its instruction cluster; unknown balances stay explicit; and tiny fees remain readable without page overflow at 320 px. Automated WCAG A/AA checks exercise all three depths in light and dark themes with reduced motion, including the expanded complete-record browser.
+Seven additional browser scenarios run on both desktop and mobile. They check that the same outcome DOM element remains mounted across depth changes; Proof replaces the graph and brings evidence into view; a token outcome survives inspecting unrelated instruction proof and reloading; switching perspective from a graph node recomputes the result; selecting a program opens its instruction cluster; unknown balances stay explicit; and tiny fees remain readable without page overflow at 320 px. Automated WCAG A/AA checks exercise all three depths in light and dark themes with reduced motion, including the expanded complete-record browser.
 
 The new scans found and corrected accessible-name mismatches in waterfall buttons and existing graph controls/nodes. Visual review widened mobile outcome cards and waterfall columns to keep ordinary transaction amounts readable. Horizontal scrolling is confined to the outcome rail and chart. These are scoped automated and emulated-device checks, not a physical-device usability study.
 

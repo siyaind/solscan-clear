@@ -129,7 +129,7 @@ export function normalize(
         title: `${position ? "Inner" : "Instruction"} ${outerIndex + 1}${position ? `.${position}` : ""} · ${label}`,
         kind: knownParser ? "parsed" : "unknown",
         path: position
-          ? `meta.innerInstructions[index=${outerIndex}].instructions[${position - 1}]`
+          ? `meta.innerInstructions[${meta?.innerInstructions?.findIndex((group) => group.index === outerIndex) ?? -1}].instructions[${position - 1}]`
           : `transaction.message.instructions[${outerIndex}]`,
         description: knownParser
           ? "Structured instruction returned by the RPC parser. Instruction amounts do not prove the recipient’s net balance change; Token-2022 fees and other instructions can affect it." +
@@ -377,6 +377,14 @@ export function normalize(
     const afterRecord = postTokens?.find(
       (b) => b.accountIndex === index && b.mint === mint,
     );
+    const beforeIndex =
+      preTokens?.findIndex(
+        (b) => b.accountIndex === index && b.mint === mint,
+      ) ?? -1;
+    const afterIndex =
+      postTokens?.findIndex(
+        (b) => b.accountIndex === index && b.mint === mint,
+      ) ?? -1;
     const decimals = (afterRecord ?? beforeRecord)!.uiTokenAmount.decimals;
     const consistent =
       !beforeRecord ||
@@ -436,7 +444,17 @@ export function normalize(
       id,
       title: `${symbol} · token account ${short(account)}`,
       kind: before !== null && after !== null ? "record" : "unknown",
-      path: `meta.preTokenBalances / postTokenBalances · accountIndex=${index} · mint=${mint}`,
+      path:
+        [
+          beforeIndex >= 0
+            ? `meta.preTokenBalances[${beforeIndex}].uiTokenAmount.amount`
+            : null,
+          afterIndex >= 0
+            ? `meta.postTokenBalances[${afterIndex}].uiTokenAmount.amount`
+            : null,
+        ]
+          .filter(Boolean)
+          .join(" → ") || "Token balance fields unavailable",
       description: `Balance in integer token units with ${decimals} decimal places. ${ownership === "changed" ? "Token authority changed; this account is not assigned to one wallet for the whole transaction." : ownership === "incomplete" ? "Owner metadata is incomplete; wallet attribution is unavailable." : "Owner is grounded in the available token balance records."} Wrapped SOL stays separate from native SOL.`,
       data: {
         pre: beforeRecord ?? null,

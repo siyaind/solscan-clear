@@ -151,6 +151,15 @@ export function TransactionWorkspace({ signature }: { signature: string }) {
   }
   function changeLayer(next: Layer) {
     updateContext({ layer: next });
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() =>
+        document
+          .getElementById(
+            next === "evidence" ? "anatomy-proof" : "anatomy-anchor",
+          )
+          ?.scrollIntoView({ block: "start" }),
+      ),
+    );
   }
   function select(id: string) {
     const asset =
@@ -183,6 +192,9 @@ export function TransactionWorkspace({ signature }: { signature: string }) {
       </div>
     );
   const selected = tx.evidence.find((e) => e.id === selection);
+  const changedAssets = anatomyOutcomes(tx, perspective).filter(
+    (asset) => asset.delta !== null && asset.delta !== "0",
+  );
   const synthetic = tx.source.kind === "synthetic";
   const title =
     tx.execution === "failed"
@@ -249,6 +261,62 @@ export function TransactionWorkspace({ signature }: { signature: string }) {
           </span>
         </div>
       </div>
+      <section
+        className="transaction-outcome-header"
+        aria-label="Transaction outcome summary"
+      >
+        <div className="outcome-header-copy">
+          <span className="eyebrow">
+            TRANSACTION OUTCOME · SELECTED ACCOUNT
+          </span>
+          <h2>
+            {tx.execution === "failed"
+              ? "Execution failed. Recorded balances tell the outcome."
+              : tx.execution === "unknown"
+                ? "The outcome is not determined."
+                : changedAssets.length
+                  ? `${changedAssets.length} ${changedAssets.length === 1 ? "balance changed" : "balances changed"} in this view.`
+                  : "No balance change recorded in this view."}
+          </h2>
+          <p>
+            These are net changes for the selected account and its attributable
+            token accounts. A decrease and increase do not, by themselves, prove
+            a swap or a recipient.
+          </p>
+        </div>
+        <div className="outcome-header-effects">
+          {changedAssets.map((asset) => (
+            <button
+              key={asset.id}
+              className={BigInt(asset.delta!) > 0n ? "increase" : "decrease"}
+              onClick={() => {
+                updateContext({
+                  subject: asset.evidenceId,
+                  selection: asset.evidenceId,
+                  layer: "impact",
+                });
+                document
+                  .getElementById("anatomy-anchor")
+                  ?.scrollIntoView({ block: "start" });
+              }}
+            >
+              <span>
+                {BigInt(asset.delta!) > 0n ? "Increased" : "Decreased"} ·{" "}
+                {asset.symbol}
+              </span>
+              <strong>
+                {units(asset.delta!, asset.decimals, true)} {asset.symbol}
+              </strong>
+            </button>
+          ))}
+          {tx.fee !== null && (
+            <button className="outcome-fee" onClick={() => showEvidence("fee")}>
+              <span>Network fee · charged to fee payer</span>
+              <strong>{units(tx.fee)} SOL</strong>
+            </button>
+          )}
+        </div>
+      </section>
       <div className="transaction-metadata">
         <div className="signature-field">
           <span className="small-label">SIGNATURE</span>

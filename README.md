@@ -2,7 +2,7 @@
 
 **See what happened. Understand why. Verify everything.**
 
-A working, read-only Solscan redesign for the Superteam India design bounty. **Transaction Anatomy** keeps one selected financial outcome visible as you unfold **Outcome → Structure → Proof**. An exact balance waterfall, adaptive relationship map, and inline source records share the same account perspective. Warm paper, precise typography, and restrained teal give the financial reconciliation room to breathe.
+A working, read-only Solscan redesign for the Superteam India design bounty. **Transaction Anatomy** starts with observed balance changes and the fee, then keeps one selected financial outcome visible as you unfold **Outcome → Structure → Proof**. A dual-scale balance explanation, focused relationship map, and plain-language proof cards share the same account perspective. [Try the live site](https://solscan-clear.vercel.app).
 
 ## Run locally
 
@@ -56,8 +56,9 @@ lib/normalize.ts                  balances, traces, relationships, reconciliatio
 lib/anatomy.ts                    exact accounting bridge and contextual relationship ranking
 components/transaction-workspace  shared perspective, outcome, evidence, and depth
 components/anatomy-stage          persistent outcome and progressive structure/proof disclosure
-components/impact-canvas          cumulative balance waterfall and exact component ledger
-components/relationship-canvas    typed edges, focused nodes, pan/zoom, text alternative
+components/impact-canvas          change explanation, full-scale waterfall, exact component ledger
+components/relationship-canvas    movement/program/context modes, typed edges, text alternative
+components/proof-card             plain-language proof with explicit limits
 components/evidence-inspector     balances, instructions, logs, raw JSON, source references
 ```
 
@@ -85,7 +86,7 @@ To refresh public recorded fixtures, run `npm run capture`. The script only perf
 
 ## Deployment
 
-This is a standard server-rendered Next.js application. Run `npm run build` then `npm run start`, or deploy the repository to a Node-compatible Next.js host and configure `SOLANA_RPC_URL` as a server secret. Static export is unsuitable because the RPC proxy must run on the server. No hosted deployment has been created by this local build.
+The live production site is [solscan-clear.vercel.app](https://solscan-clear.vercel.app), deployed in the Vercel scope `rishu4436s-projects`. This is a server-rendered Next.js application. `SOLANA_RPC_URL` defaults to the official public mainnet endpoint; a private archival provider can be configured as a server secret. Static export is unsuitable because the RPC proxy runs on the server. Deployment currently uses the Vercel CLI; GitHub pushes do not automatically redeploy this project.
 
 ## Delivery boundaries
 

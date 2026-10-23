@@ -14,21 +14,21 @@ Reference: [Solscan TX Map](https://docs.solscan.io/transaction-details/transact
 
 ### 1. Transaction Anatomy
 
-The central feature is a persistent financial outcome that opens progressively. The outcome card remains mounted while the user moves through Outcome, Structure, and Proof using labeled buttons or a keyboard-operable depth slider. Account perspective, outcome identity, and selected evidence are separate state: inspecting a fee or instruction does not replace the token balance being investigated. All four values survive sharing and reload.
+The transaction opens with a summary of observed balance changes and the network fee for the selected account. It does not call every decrease/increase pair a swap. The central feature is a persistent financial outcome that opens progressively. The outcome card remains mounted and sticky while the user moves through Outcome, Structure, and Proof. Account perspective, outcome identity, and selected evidence are separate state: inspecting a fee or instruction does not replace the token balance being investigated. All four values survive sharing and reload.
 
 **Outcome — “What changed?”**
 
-Select a native or individual token-account outcome, then inspect its cumulative balance waterfall and exact component ledger. Native fees, supported System transfers, account funding, and unknown remainders open their supporting records. Tiny fees retain a minimum-height marker with the exact amount beside it; monetary arithmetic remains integer-based. Token outcomes show recorded net changes rather than reconstructing receipt from gross instructions. Unknown balances do not produce a fabricated chart, and an arithmetically reconciled residual is still labeled unexplained.
+Select a native or individual token-account outcome, then inspect either the component-focused change explanation or the full common-scale balance waterfall. The exact component ledger remains available in both views. Native fees, supported System transfers, account funding, and unknown remainders open their supporting records. Tiny fees receive an explicitly labeled minimum marker in the change view; monetary arithmetic remains integer-based. Token outcomes show recorded net changes rather than reconstructing receipt from gross instructions. Unknown balances do not produce a fabricated chart, and an arithmetically reconciled residual is still labeled unexplained.
 
 For the labeled synthetic transfer, the sender's 2 SOL becomes 1.749995 SOL after a 0.25 SOL transfer and 0.000005 SOL fee. Switching to the recipient independently shows 1 SOL becoming 1.25 SOL, with no payer fee attributed to that account. This is an accounting decomposition, not an instruction timeline.
 
 **Structure — “How are the entities related?”**
 
-A focused metro-style dependency diagram uses three line styles: solid asset movement, dashed program invocation, and dotted account references. It ranks actual dependencies around the selected outcome, perspective, and evidence, initially showing up to seven accounts and expanding to twelve. Selecting a program exposes its recorded instructions; selecting a counterparty offers a direct perspective switch. The persistent outcome stays above, and its balance breakdown can reopen beside the map. Pan, zoom, fit, the complete relationship list, and the account directory remain available. On mobile, selectable nodes become a vertical account directory; physical vertical order is not presented as execution sequence.
+A focused metro-style dependency diagram uses three line styles: solid asset movement, dashed program invocation, and dotted account references. Money changes, Program interactions, and Full context modes reduce competing lines. It ranks dependencies around the selected outcome, perspective, and evidence, initially showing up to seven accounts and expanding to twelve. Selecting a program exposes its recorded instruction count and individual fields; selecting a counterparty offers a direct perspective switch. The persistent outcome stays above, and its balance breakdown can reopen beside the map. Pan, zoom, fit, the relationship list, and the account directory remain available. On mobile, selectable nodes become a vertical account directory; physical vertical order is not presented as execution sequence.
 
 **Proof — “How can I verify it?”**
 
-The selected detail opens inline into its exact field reference and underlying JSON while retaining the outcome and structure. The complete record browser is available through an additional disclosure for balances, instructions, inner traces, logs, and raw JSON. Direct balance evidence is “Verified on-chain,” server parser output is “Parsed interpretation,” and unsupported semantics are “Not determined.” Synthetic example records are labeled synthetic rather than on-chain verified.
+The graph compresses into a selected-path summary when Proof opens, so the relevant evidence appears immediately while the selected balance stays in view. A plain-language card states what the chosen record shows and what it cannot establish. Exact source field references follow, with original JSON under an explicit disclosure. The complete record browser is available for balances, instructions, inner traces, logs, and raw JSON. Direct balance evidence is “Verified on-chain,” server parser output is “Parsed interpretation,” and unsupported semantics are “Not determined.” Synthetic example records are labeled synthetic rather than on-chain verified.
 
 The inspector stays visible on desktop. On mobile, proof opens inline and the full inspector remains an explicitly opened keyboard-safe sheet. These changes develop the existing TX Map workflow through persistent context and progressive disclosure; they do not claim that transaction maps themselves are new.
 
@@ -67,7 +67,7 @@ The parser classifies standard System and SPL/Token-2022 transfers conservativel
 
 The demo contains 22 real mainnet captures and one separately labeled synthetic minimal SOL transfer. The synthetic case is an explanatory tool, not proof of a real transfer. Public RPC limits can affect live lookup and wallet history; no live lookup substitutes example data on error.
 
-The implementation and screenshots do not replace the required Figma artifact. See the screen checklist for before/after frame assembly. No Figma file or live hosted deployment is claimed.
+The implementation and screenshots do not replace the required Figma artifact. See the screen checklist for before/after frame assembly. No Figma file is claimed. The working application is deployed at [solscan-clear.vercel.app](https://solscan-clear.vercel.app).
 
 ## Technical sources consulted
 

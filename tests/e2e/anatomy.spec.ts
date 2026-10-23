@@ -29,6 +29,8 @@ test("one outcome stays mounted while its structure and proof unfold", async ({
   await depth.press("ArrowRight");
   await expect(page.locator(".evidence-peel.open")).toBeVisible();
   await expect(page.locator(".peel-reference")).toContainText("meta.fee");
+  await expect(page.locator(".proof-card")).toContainText("network fee");
+  await page.getByText("View original RPC fields").click();
   await expect(page.locator(".peel-json pre")).toContainText("5000");
   await expect(page.locator(".sr-only[aria-live='polite']")).toHaveText(
     selected,
@@ -39,6 +41,38 @@ test("one outcome stays mounted while its structure and proof unfold", async ({
   await expect(page.locator(".money-ledger-row.selected")).toContainText(
     "Network fee",
   );
+});
+
+test("proof replaces the long graph and keeps the selected balance in view", async ({
+  page,
+}) => {
+  await page.goto("/tx/demo-design-transfer");
+  await page.getByRole("button", { name: /^Proof/ }).click();
+  await expect(page.locator(".relationship-panel")).toHaveCount(0);
+  await expect(page.locator(".anatomy-path-summary")).toContainText(
+    "SOL balance",
+  );
+  await expect(page.locator(".proof-card")).toContainText(
+    "What this record shows",
+  );
+  await expect
+    .poll(async () =>
+      page.evaluate(() => {
+        const anchor = document
+          .querySelector(".anatomy-anchor")!
+          .getBoundingClientRect();
+        const proof = document
+          .querySelector(".evidence-peel")!
+          .getBoundingClientRect();
+        return (
+          anchor.top >= 0 &&
+          anchor.top < innerHeight &&
+          proof.top >= 0 &&
+          proof.top < innerHeight
+        );
+      }),
+    )
+    .toBe(true);
 });
 
 test("a token outcome and different instruction proof survive sharing and reload", async ({
@@ -101,6 +135,7 @@ test("selecting a program opens its instruction cluster while retaining the bala
   const subject = await page
     .locator(".anatomy-anchor")
     .getAttribute("data-evidence-id");
+  await page.getByRole("button", { name: "Program interactions" }).click();
   await page.locator(`${nodes} button[data-address='${SYSTEM}']`).click();
   await expect(
     page.getByRole("region", { name: "Selected program instructions" }),
@@ -108,6 +143,7 @@ test("selecting a program opens its instruction cluster while retaining the bala
   await expect(page.locator(".program-instructions button")).toHaveCount(1);
   await page.locator(".program-instructions button").click();
   await page.getByRole("button", { name: "Reveal this proof" }).click();
+  await page.getByText("View original RPC fields").click();
   await expect(page.locator(".peel-json pre")).toContainText("transfer");
   await expect(page.locator(".anatomy-anchor")).toHaveAttribute(
     "data-evidence-id",
@@ -120,6 +156,11 @@ test("unknown balances remain explicit and tiny fees stay readable at narrow wid
 }) => {
   await page.setViewportSize({ width: 320, height: 800 });
   await page.goto("/tx/demo-design-transfer");
+  await expect(
+    page.getByRole("button", { name: "Explain the change" }),
+  ).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator(".change-part.fee")).toContainText("−0.000005");
+  await page.getByRole("button", { name: "Full balance scale" }).click();
   const fee = page.locator(".waterfall-step.fee");
   await fee.scrollIntoViewIfNeeded();
   await expect(fee).toContainText("−0.000005");

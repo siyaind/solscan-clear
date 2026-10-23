@@ -269,6 +269,7 @@ describe("token and account-index edge cases", () => {
   it("preserves inner instruction evidence paths", () => {
     const input = syntheticTransfer();
     input.meta!.innerInstructions = [
+      { index: 42, instructions: [] },
       {
         index: 0,
         instructions: [
@@ -279,7 +280,7 @@ describe("token and account-index edge cases", () => {
     const tx = normalize(input, source);
     expect(tx.instructions[1].evidenceId).toBe("ix:0:0");
     expect(tx.evidence.find((e) => e.id === "ix:0:0")?.path).toBe(
-      "meta.innerInstructions[index=0].instructions[0]",
+      "meta.innerInstructions[1].instructions[0]",
     );
   });
 });

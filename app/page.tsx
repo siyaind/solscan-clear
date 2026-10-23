@@ -19,26 +19,30 @@ const questions = [
   {
     icon: ArrowUpRight,
     title: "Where did my SOL go?",
-    detail: "Make every balance change add up.",
+    detail: "Try a recorded transaction and make every balance change add up.",
     href: `${defaultExample}?layer=impact`,
+    action: "Try recorded example",
   },
   {
     icon: ScanLine,
     title: "What happened in this transaction?",
     detail: "See the outcome. Unfold the structure. Reveal the proof.",
     href: defaultExample,
+    action: "Try recorded example",
   },
   {
     icon: CircleHelp,
     title: "Why did this transaction fail?",
     detail: "Understand the outcome, including the fee.",
     href: "/tx/demo-transfer-failed-9",
+    action: "Try recorded example",
   },
   {
     icon: Fingerprint,
     title: "Are these addresses the same?",
     detail: "Compare the whole address, character by character.",
     href: "/compare",
+    action: "Open address tool",
   },
 ];
 
@@ -133,10 +137,42 @@ export default function HomePage() {
               </div>
               <h3>{q.title}</h3>
               <p>{q.detail}</p>
+              <span className="question-action">{q.action}</span>
               <ArrowUpRight className="question-arrow" size={18} />
             </Link>
           ))}
         </div>
+      </section>
+      <section
+        className="case-study-entry"
+        aria-label="Real transaction case study"
+      >
+        <span className="eyebrow">
+          ONE REAL MAINNET TRANSACTION · TWO WAYS TO INVESTIGATE
+        </span>
+        <h2>Start with the same record.</h2>
+        <p>
+          Compare Solscan’s original transaction view with CLEAR’s outcome,
+          structure, and proof for the same captured signature. The CLEAR
+          example is a preserved mainnet record; it is not a live price or
+          activity feed.
+        </p>
+        <div>
+          <a
+            href="https://solscan.io/tx/4KxpWzijGzn5HSRNfCWGMpiEXUgKJs3J4qCCzMQoNxGAo2A1Evx9gciScLkqWHcj3Pwwjz5tTcwqgkByD3kzgAHb"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Open original Solscan view <ArrowUpRight size={16} />
+          </a>
+          <Link href={defaultExample}>
+            Explore the same transaction in CLEAR <ArrowRight size={16} />
+          </Link>
+        </div>
+        <small>
+          The synthetic SOL transfer remains available as a separate educational
+          fixture in the example selector.
+        </small>
       </section>
       <section className="examples-section" id="examples">
         <div className="section-heading">

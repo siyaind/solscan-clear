@@ -18,6 +18,7 @@ import { Classification, CopyButton } from "./ui";
 import { ImpactCanvas } from "./impact-canvas";
 import { RelationshipCanvas } from "./relationship-canvas";
 import { EvidenceView } from "./evidence-inspector";
+import { ProofCard } from "./proof-card";
 
 const depths: {
   layer: Layer;
@@ -150,6 +151,11 @@ export function AnatomyStage({
           </button>
         ))}
       </div>
+      {outcomes.length > 1 && (
+        <p className="outcome-scroll-cue">
+          Scroll sideways to inspect all {outcomes.length} recorded balances →
+        </p>
+      )}
       <div className="anatomy-depth-control">
         <div className="depth-description">
           <span className="eyebrow">EXPLORE DEPTH</span>
@@ -196,6 +202,7 @@ export function AnatomyStage({
         </div>
       </div>
       <div
+        id="anatomy-anchor"
         className={`anatomy-anchor ${tone}`}
         data-evidence-id={asset.evidenceId}
       >
@@ -274,7 +281,7 @@ export function AnatomyStage({
               onEvidence={onEvidence}
             />
           </div>
-          {depth >= 1 && (
+          {depth === 1 && (
             <div className="anatomy-structure" id="anatomy-structure">
               <RelationshipCanvas
                 tx={tx}
@@ -285,6 +292,18 @@ export function AnatomyStage({
                 onEvidence={onEvidence}
                 onPerspective={onPerspective}
               />
+            </div>
+          )}
+          {depth === 2 && (
+            <div className="anatomy-path-summary">
+              <GitBranch size={16} />
+              <span>
+                Selected path: {asset.symbol} balance →{" "}
+                {selected?.title ?? "record"}
+              </span>
+              <button onClick={() => onLayer("connections")}>
+                Inspect structure
+              </button>
             </div>
           )}
           <section
@@ -308,15 +327,19 @@ export function AnatomyStage({
             <p>{selected?.description}</p>
             {depth === 2 && selected ? (
               <>
+                <ProofCard tx={tx} evidence={selected} />
                 <div className="peel-reference">
-                  <span className="small-label">EXACT RECORD PATH</span>
+                  <span className="small-label">SOURCE RPC FIELDS</span>
                   <code>{selected.path}</code>
                   <CopyButton
                     value={selected.path}
                     label="Copy evidence path"
                   />
                 </div>
-                <div className="peel-json">
+                <details className="peel-json">
+                  <summary>
+                    View original RPC fields <ChevronDown size={16} />
+                  </summary>
                   <div>
                     <span>Underlying record</span>
                     <CopyButton
@@ -327,7 +350,7 @@ export function AnatomyStage({
                   <pre tabIndex={0} aria-label="Selected evidence JSON">
                     {JSON.stringify(selected.data, null, 2)}
                   </pre>
-                </div>
+                </details>
                 <p className="peel-context">
                   Outcome retained above: {asset.symbol} ·{" "}
                   {short(asset.account)}. Selecting evidence does not change

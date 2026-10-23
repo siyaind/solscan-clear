@@ -1,0 +1,409 @@
+.transaction-outcome-header {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.9fr) minmax(0, 1.1fr);
+  gap: 28px;
+  padding: 24px;
+  margin: 0 0 18px;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--teal-dark);
+  border-radius: 9px;
+  background: var(--surface);
+}
+.outcome-header-copy h2 {
+  font-size: clamp(20px, 2vw, 28px);
+  line-height: 1.25;
+  margin: 8px 0;
+  letter-spacing: -0.6px;
+}
+.outcome-header-copy p {
+  color: var(--muted);
+  line-height: 1.65;
+  margin: 0;
+  font-size: 12px;
+}
+.outcome-header-effects {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 8px;
+  align-content: center;
+}
+.outcome-header-effects button {
+  text-align: left;
+  padding: 13px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--surface-soft);
+  min-width: 0;
+}
+.outcome-header-effects button:hover {
+  border-color: var(--teal-dark);
+}
+.outcome-header-effects span {
+  display: block;
+  font-size: 11px;
+  color: var(--muted);
+}
+.outcome-header-effects strong {
+  display: block;
+  margin-top: 7px;
+  font-family: var(--mono);
+  font-size: 17px;
+  font-weight: 400;
+  overflow-wrap: anywhere;
+}
+.outcome-header-effects .increase strong {
+  color: var(--teal-dark);
+}
+.outcome-header-effects .decrease strong {
+  color: var(--orange);
+}
+.outcome-header-effects .outcome-fee {
+  border-style: dashed;
+}
+.anatomy-anchor {
+  position: sticky;
+  top: 72px;
+  z-index: 5;
+}
+#anatomy-anchor {
+  scroll-margin-top: 85px;
+}
+#anatomy-proof {
+  scroll-margin-top: 235px;
+}
+.anatomy-path-summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 22px;
+  background: var(--surface-soft);
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 12px;
+}
+.anatomy-path-summary span {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.anatomy-path-summary button {
+  color: var(--teal-dark);
+  text-decoration: underline;
+  white-space: nowrap;
+}
+.proof-card {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+}
+.proof-card > div:not(.proof-values) {
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--surface);
+}
+.proof-card strong {
+  font-size: 12px;
+}
+.proof-card p {
+  font-size: 12px;
+  line-height: 1.6;
+  margin: 5px 0 0;
+  color: var(--muted);
+}
+.proof-card small {
+  color: var(--orange);
+}
+.proof-values {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.proof-values span {
+  display: grid;
+  gap: 6px;
+  padding: 12px;
+  border-radius: 6px;
+  background: var(--teal-soft);
+  font-size: 11px;
+  color: var(--muted);
+}
+.proof-values strong {
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 400;
+  overflow-wrap: anywhere;
+}
+.peel-json summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  padding: 13px;
+  color: var(--teal-dark);
+  font-size: 12px;
+}
+.balance-view-switch,
+.relationship-modes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 15px 0;
+}
+.balance-view-switch button,
+.relationship-modes button {
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  padding: 9px 12px;
+  font-size: 12px;
+  color: var(--muted);
+  background: var(--surface);
+}
+.balance-view-switch button[aria-pressed="true"],
+.relationship-modes button[aria-pressed="true"] {
+  border-color: var(--teal-dark);
+  color: var(--teal-dark);
+  background: var(--teal-soft);
+  font-weight: 700;
+}
+.change-explanation {
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 16px;
+}
+.change-equation {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.change-equation span {
+  display: grid;
+  gap: 5px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.change-equation strong {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.change-part {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 9px 0;
+  border-top: 1px solid var(--line);
+}
+.change-part > span:first-child {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 12px;
+}
+.change-part small {
+  font-family: var(--mono);
+  color: var(--muted);
+}
+.change-bar {
+  display: block;
+  height: 12px;
+  margin-top: 6px;
+  background: var(--surface-soft);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.change-bar i {
+  display: block;
+  height: 100%;
+  background: var(--teal-dark);
+  border-radius: inherit;
+}
+.change-bar.outgoing i {
+  background: var(--orange);
+}
+.change-bar.fee i {
+  background: var(--graph-blue);
+}
+.change-bar.unclassified i {
+  background: var(--muted);
+}
+.amplified-label {
+  display: block;
+  font-size: 10px;
+  margin-top: 4px;
+}
+.change-scale-note,
+.relationship-mode-caption {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.6;
+  margin: 9px 0;
+}
+.question-action {
+  display: inline-block;
+  margin-top: 12px;
+  font-size: 11px;
+  color: var(--teal-dark);
+  font-weight: 700;
+}
+.outcome-scroll-cue,
+.waterfall-scroll-cue {
+  display: none;
+}
+.case-study-entry {
+  margin: 28px 0;
+  padding: 30px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--surface);
+}
+.case-study-entry h2 {
+  margin: 8px 0;
+  font-size: 27px;
+}
+.case-study-entry p {
+  max-width: 700px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+.case-study-entry > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 20px 0;
+}
+.case-study-entry a {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 12px 15px;
+  border: 1px solid var(--teal-dark);
+  border-radius: 5px;
+  color: var(--teal-dark);
+  text-decoration: none;
+}
+.case-study-entry a:last-child {
+  background: var(--teal-dark);
+  color: var(--surface);
+}
+.case-study-entry small {
+  color: var(--muted);
+}
+@media (max-width: 700px) {
+  .transaction-outcome-header {
+    grid-template-columns: 1fr;
+    gap: 15px;
+    padding: 19px;
+  }
+  .outcome-header-copy p,
+  .outcome-header-effects span,
+  .proof-card p {
+    font-size: 14px;
+  }
+  .outcome-header-effects {
+    grid-template-columns: 1fr;
+  }
+  .outcome-header-effects strong {
+    font-size: 19px;
+  }
+  .anatomy-anchor {
+    top: 64px;
+  }
+  #anatomy-proof {
+    scroll-margin-top: 248px;
+  }
+  .anatomy-path-summary {
+    flex-wrap: wrap;
+    font-size: 13px;
+  }
+  .proof-values {
+    grid-template-columns: 1fr;
+  }
+  .proof-values span {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 13px;
+  }
+  .proof-values strong {
+    font-size: 14px;
+  }
+  .transaction-anatomy .eyebrow,
+  .outcome-label > span,
+  .outcome-hint,
+  .anchor-outcome > p,
+  .anchor-balances span,
+  .anchor-balances > small,
+  .waterfall-source,
+  .money-footnote > p,
+  .anatomy-structure .map-caption,
+  .anatomy-structure .movement-instruction-note {
+    font-size: 12px;
+  }
+  .anatomy-intro > p,
+  .anatomy-note,
+  .anatomy-structure .panel-description,
+  .anatomy-navigation p,
+  .evidence-peel > p {
+    font-size: 14px;
+  }
+  .outcome-label,
+  .depth-stops strong,
+  .waterfall-label,
+  .money-ledger-row,
+  .money-ledger-row > strong,
+  .money-ledger-row > span > small,
+  .anatomy-structure .mobile-map-list strong,
+  .anatomy-structure .mobile-map-list code,
+  .anatomy-all-evidence > summary {
+    font-size: 13px;
+  }
+  .balance-view-switch button,
+  .relationship-modes button {
+    font-size: 13px;
+    min-height: 42px;
+  }
+  .change-equation {
+    grid-template-columns: 1fr;
+  }
+  .change-equation span {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+  }
+  .case-study-entry {
+    padding: 20px;
+  }
+  .case-study-entry a {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .anatomy-outcomes {
+    scroll-snap-type: x mandatory;
+  }
+  .anatomy-outcome {
+    scroll-snap-align: start;
+  }
+  .waterfall-scroll {
+    scroll-snap-type: x proximity;
+  }
+  .waterfall-step {
+    scroll-snap-align: start;
+  }
+  .outcome-scroll-cue,
+  .waterfall-scroll-cue {
+    display: block;
+    margin: 0 0 14px;
+    color: var(--teal-dark);
+    font-size: 12px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}

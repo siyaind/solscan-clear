@@ -36,6 +36,7 @@ export function RelationshipCanvas({
   onPerspective: (address: string) => void;
 }) {
   const [expanded, setExpanded] = useState(false);
+  const [mode, setMode] = useState<"money" | "programs" | "all">("money");
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const drag = useRef<{ x: number; y: number; px: number; py: number } | null>(
@@ -102,7 +103,14 @@ export function RelationshipCanvas({
     });
   }, [tx, perspective, subject, selection, expanded]);
   const addresses = nodes.map((n) => n.address);
-  const edges = tx.relationships.filter(
+  const modeEdges = tx.relationships.filter(
+    (edge) =>
+      mode === "all" ||
+      (mode === "money"
+        ? edge.kind === "movement"
+        : edge.kind === "invocation"),
+  );
+  const edges = modeEdges.filter(
     (r) => addresses.includes(r.from) && addresses.includes(r.to),
   );
   const visibleEdges = edges.filter(
@@ -114,6 +122,16 @@ export function RelationshipCanvas({
           other.kind === edge.kind,
       ) === index,
   );
+  const visibleNodeAddresses = new Set([
+    perspective,
+    tx.assets.find((asset) => asset.evidenceId === subject)?.account ??
+      perspective,
+    ...edges.flatMap((edge) => [edge.from, edge.to]),
+  ]);
+  const visibleNodes =
+    mode === "all"
+      ? nodes
+      : nodes.filter((node) => visibleNodeAddresses.has(node.address));
   function reset() {
     setZoom(1);
     setPan({ x: 0, y: 0 });
@@ -133,11 +151,39 @@ export function RelationshipCanvas({
             ? "Attempted dependencies, without successful transfer arrows."
             : "A map built around your selected outcome and detail. Select a program to unfold its instructions."}
         </p>
+        <div
+          className="relationship-modes"
+          role="group"
+          aria-label="Relationship focus"
+        >
+          <button
+            aria-pressed={mode === "money"}
+            onClick={() => setMode("money")}
+          >
+            Money changes
+          </button>
+          <button
+            aria-pressed={mode === "programs"}
+            onClick={() => setMode("programs")}
+          >
+            Program interactions
+          </button>
+          <button aria-pressed={mode === "all"} onClick={() => setMode("all")}>
+            Full context
+          </button>
+        </div>
+        <p className="relationship-mode-caption">
+          {mode === "money"
+            ? "Only supported asset movements between accounts. These lines do not imply movement through a program."
+            : mode === "programs"
+              ? "Program invocation lines show instruction dependencies, not token transfers."
+              : "All recorded movements, invocations, and account references."}
+        </p>
         <div className="map-toolbar">
           <span>
             <span className="status-dot" />
-            {nodes.length} accounts in focus · {focus.hidden} more relevant
-            accounts
+            {visibleNodes.length} accounts in focus · {focus.hidden} more
+            relevant accounts
           </span>
           <div>
             <button
@@ -274,7 +320,7 @@ export function RelationshipCanvas({
                 );
               })}
             </svg>
-            {nodes.map((node) => (
+            {visibleNodes.map((node) => (
               <button
                 className={`graph-node ${node.type} ${selected?.account === node.address || selection === node.evidenceId ? "selected" : ""}`}
                 style={{
@@ -325,7 +371,7 @@ export function RelationshipCanvas({
           </div>
         </div>
         <div className="mobile-map-list">
-          {nodes.map((node, i) => (
+          {visibleNodes.map((node, i) => (
             <button
               key={node.address}
               data-address={node.address}
@@ -375,7 +421,12 @@ export function RelationshipCanvas({
             aria-label="Selected program instructions"
           >
             <p className="anatomy-note">
-              Recorded instructions for this program
+              This program appears in{" "}
+              {
+                tx.instructions.filter((ix) => ix.program === focus.focus)
+                  .length
+              }{" "}
+              recorded instructions. Choose one to inspect its fields.
             </p>
             {tx.instructions
               .filter((ix) => ix.program === focus.focus)
@@ -429,10 +480,10 @@ export function RelationshipCanvas({
       <details className="connection-text panel">
         <summary>
           All relationships · accessible text view <ChevronDown size={15} />
-          <span>{tx.relationships.length} records</span>
+          <span>{modeEdges.length} records</span>
         </summary>
         <div>
-          {tx.relationships.map((edge) => (
+          {modeEdges.map((edge) => (
             <button
               key={edge.id}
               className={selection === edge.evidenceId ? "selected" : ""}
