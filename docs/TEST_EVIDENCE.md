@@ -48,7 +48,9 @@ Desktop and mobile Impact/Evidence/Connections captures were visually reviewed f
 
 ## Hosted CI status
 
-The [initial GitHub Actions run](https://github.com/rishu4436/solscan-clear/actions/runs/39938825952) stopped before any workflow step executed. GitHub reported an account billing/spending-limit restriction. This is not a hosted test pass or a code-test failure; the local results above are the completed verification. Billing settings were not changed. The account owner can address the restriction in GitHub settings and rerun the workflow.
+The [initial GitHub Actions run](https://github.com/rishu4436/solscan-clear/actions/runs/39938825952) in the previous repository stopped before any workflow step executed because of an account billing/spending-limit restriction. That run did not execute code tests. Billing settings were not changed.
+
+The project now uses the private [siyaind/solscan-clear repository](https://github.com/siyaind/solscan-clear). Hosted checks started under this account. Its first run exposed reduced text contrast during the mobile panel's entry fade; the panel now keeps full opacity while sliding into place. The existing WCAG checks passed three consecutive scans at each viewport locally after this fix. Current hosted results are available in [GitHub Actions](https://github.com/siyaind/solscan-clear/actions).
 
 ## Reproduce locally
 
