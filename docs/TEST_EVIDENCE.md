@@ -46,8 +46,6 @@ Observed response: `source.kind = live`, execution `success`, finality `finalize
 
 Desktop and mobile Impact/Evidence/Connections captures were visually reviewed for hierarchy, graph legibility, long-identifier wrapping, amount readability, and overflow. The graph’s initial node selection was refined to prioritize application programs and token counterparties. Screenshots are under `docs/screenshots/`, with original Solscan before screens clearly distinguished by their `original-` prefix. Mobile uses a vertical account view and a separate evidence sheet, rather than shrinking the desktop graph.
 
-## Reproduce
-
 ## Hosted CI status
 
 The [initial GitHub Actions run](https://github.com/rishu4436/solscan-clear/actions/runs/39938825952) stopped before any workflow step executed. GitHub reported an account billing/spending-limit restriction. This is not a hosted test pass or a code-test failure; the local results above are the completed verification. Billing settings were not changed. The account owner can address the restriction in GitHub settings and rerun the workflow.
