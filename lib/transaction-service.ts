@@ -3,6 +3,11 @@ import { z } from "zod";
 import { normalize } from "./normalize";
 import { rpc, RpcError } from "./rpc";
 import type { Transaction } from "./model";
+import { applyTokenIdentities } from "./token-identity";
+import {
+  createTokenIdentityResolver,
+  tokenIdentityResolver,
+} from "./token-identity-resolver";
 
 type RpcCall = (method: string, params: unknown[]) => Promise<unknown>;
 const statusesSchema = z.object({
@@ -87,5 +92,27 @@ export async function fetchTransaction(
       "The provider returned a transaction with a different signature.",
       "mismatch",
     );
-  return { state: "ready", tx };
+  let timeout: ReturnType<typeof setTimeout> | undefined;
+  try {
+    const identities = await Promise.race([
+      (call === rpc
+        ? tokenIdentityResolver
+        : createTokenIdentityResolver(call)
+      ).resolveMany([
+        ...tx.assets
+          .filter((asset) => !asset.native)
+          .map((asset) => asset.mint),
+        ...tx.relationships.flatMap((edge) => (edge.mint ? [edge.mint] : [])),
+      ]),
+      new Promise<null>((resolve) => {
+        timeout = setTimeout(() => resolve(null), 4000);
+      }),
+    ]);
+    return {
+      state: "ready",
+      tx: identities ? applyTokenIdentities(tx, identities) : tx,
+    };
+  } finally {
+    if (timeout) clearTimeout(timeout);
+  }
 }

@@ -16,6 +16,7 @@ import type { Evidence, Layer, Transaction } from "@/lib/model";
 import { short, units } from "@/lib/format";
 import { Address, Classification, CopyButton } from "./ui";
 import { evidenceCategory } from "@/lib/view-state";
+import { TokenIdentityDetails } from "./token-identity";
 
 export function EvidenceInspector({
   tx,
@@ -66,6 +67,10 @@ export function EvidenceInspector({
             <Classification
               kind={evidence.kind}
               synthetic={tx.source.kind === "synthetic"}
+            />
+            <TokenIdentityDetails
+              identity={asset?.identity}
+              account={asset?.account}
             />
             {evidence.account && (
               <div className="inspector-account">

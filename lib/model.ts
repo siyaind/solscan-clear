@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { TokenIdentity } from "./token-identity";
 
 const numeric = z.union([
   z.string().regex(/^\d+$/),
@@ -135,6 +136,7 @@ export type Account = {
   evidenceId: string;
 };
 export type AssetChange = {
+  identity?: TokenIdentity;
   id: string;
   account: string;
   owner?: string;
@@ -162,6 +164,7 @@ export type Instruction = {
   raw: RpcInstruction;
 };
 export type Relationship = {
+  identity?: TokenIdentity;
   id: string;
   from: string;
   to: string;

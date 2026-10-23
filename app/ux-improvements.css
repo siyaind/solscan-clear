@@ -449,3 +449,59 @@
     scroll-behavior: auto;
   }
 }
+.token-identity-caption {
+  display: block;
+  margin-top: 7px;
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.token-identity-caption > span {
+  display: block;
+  font-family: var(--mono);
+  font-size: 10px;
+}
+.token-identity-details {
+  text-align: left;
+  margin: 12px 0;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  font-size: 12px;
+  background: var(--surface);
+  min-width: 0;
+}
+.token-identity-details summary {
+  padding: 10px 12px;
+  cursor: pointer;
+  color: var(--teal-dark);
+  overflow-wrap: anywhere;
+}
+.token-identity-details > div {
+  padding: 0 12px 12px;
+  max-height: 280px;
+  overflow: auto;
+}
+.token-identity-details p {
+  color: var(--muted);
+  line-height: 1.65;
+  font-size: 12px;
+}
+.token-identity-details code {
+  overflow-wrap: anywhere;
+}
+.token-mint-address {
+  display: flex;
+  align-items: start;
+  gap: 7px;
+  margin: 8px 0;
+}
+.token-mint-address code {
+  min-width: 0;
+  flex: 1;
+}
+.graph-token-mint {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 9px;
+}

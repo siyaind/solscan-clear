@@ -17,6 +17,7 @@ import { PROGRAMS, type Transaction } from "@/lib/model";
 import { focusedRelationships } from "@/lib/anatomy";
 import { short, units } from "@/lib/format";
 import { Address } from "./ui";
+import { TokenIdentityDetails } from "./token-identity";
 
 export function RelationshipCanvas({
   tx,
@@ -83,18 +84,26 @@ export function RelationshipCanvas({
         : collapsedPositions[i];
       return {
         address,
+        token,
         label:
           address === perspective
-            ? "Selected perspective"
+            ? token
+              ? `${token.symbol} token account · selected`
+              : "Selected account"
             : program
               ? (PROGRAMS[address] ?? "Program")
               : token
-                ? `${token.symbol} account`
+                ? `${token.symbol} token account`
                 : account?.signer
                   ? "Signer"
                   : "Related account",
-        type:
-          address === perspective ? "wallet" : program ? "program" : "account",
+        type: program
+          ? "program"
+          : token
+            ? "account"
+            : account?.signer
+              ? "wallet"
+              : "account",
         evidenceId: program
           ? tx.instructions.find((ix) => ix.program === address)!.evidenceId
           : (token?.evidenceId ?? account?.evidenceId ?? "status"),
@@ -342,6 +351,11 @@ export function RelationshipCanvas({
                 </span>
                 <strong>{node.label}</strong>
                 <code>{short(node.address, 4)}</code>
+                {node.token && (
+                  <small className="graph-token-mint">
+                    Mint {short(node.token.mint, 3)}
+                  </small>
+                )}
               </button>
             ))}
           </div>
@@ -434,6 +448,7 @@ export function RelationshipCanvas({
                 </small>
                 <strong>{node.label}</strong>
                 <code>{short(node.address, 6)}</code>
+                {node.token && <small>Mint {short(node.token.mint, 5)}</small>}
               </span>
               <ArrowUpRight size={15} />
             </button>
@@ -455,6 +470,14 @@ export function RelationshipCanvas({
               </button>
             )}
         </div>
+        <TokenIdentityDetails
+          identity={
+            tx.assets.find(
+              (asset) => asset.account === focus.focus && !asset.native,
+            )?.identity
+          }
+          account={focus.focus}
+        />
         {tx.instructions.some((ix) => ix.program === focus.focus) && (
           <div
             className="program-instructions"
@@ -542,6 +565,7 @@ export function RelationshipCanvas({
                     ? ` · ${edge.decimals === undefined ? `${edge.amount} base units` : units(edge.amount, edge.decimals)}`
                     : ""}
                   {edge.symbol ? ` ${edge.symbol}` : ""}
+                  {edge.mint ? ` · mint ${edge.mint}` : ""}
                   {edge.transferFee !== undefined
                     ? ` · recorded instruction fee ${units(edge.transferFee, edge.decimals ?? 0)} ${edge.symbol ?? "base units"}`
                     : ""}

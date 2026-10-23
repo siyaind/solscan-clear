@@ -22,6 +22,8 @@ import type { Layer, Transaction } from "@/lib/model";
 import { Classification, CopyButton, ErrorState, Loading } from "./ui";
 import { AnatomyStage } from "./anatomy-stage";
 import { anatomyOutcomes } from "@/lib/anatomy";
+import { applyTokenIdentities } from "@/lib/token-identity";
+import { TokenIdentityCaption } from "./token-identity";
 import { EvidenceInspector } from "./evidence-inspector";
 import { ResponsiveInspector } from "./responsive-inspector";
 import {
@@ -109,6 +111,38 @@ export function TransactionWorkspace({ signature }: { signature: string }) {
         setLayer(saved.layer);
         setSheetOpen(false);
         setFullSignature(false);
+        if (demo && transaction.source.kind !== "synthetic") {
+          const mints = [
+            ...new Set([
+              ...transaction.assets
+                .filter((asset) => !asset.native)
+                .map((asset) => asset.mint),
+              ...transaction.relationships.flatMap((edge) =>
+                edge.mint ? [edge.mint] : [],
+              ),
+            ]),
+          ].slice(0, 32);
+          if (mints.length)
+            void fetch("/api/token-identities", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ mints }),
+              signal: controller.signal,
+            })
+              .then(async (response) => {
+                if (!response.ok) return;
+                const result = await response.json();
+                if (!controller.signal.aborted && result.identities)
+                  setTx((current) =>
+                    current?.signature === transaction.signature
+                      ? applyTokenIdentities(current, result.identities)
+                      : current,
+                  );
+              })
+              .catch(() => {
+                /* Preserve exact transaction records when metadata is unavailable. */
+              });
+        }
       } catch (caught) {
         if (!controller.signal.aborted)
           setError({
@@ -309,6 +343,7 @@ export function TransactionWorkspace({ signature }: { signature: string }) {
               <strong>
                 {units(asset.delta!, asset.decimals, true)} {asset.symbol}
               </strong>
+              <TokenIdentityCaption identity={asset.identity} />
             </button>
           ))}
           {tx.fee !== null && (
@@ -525,8 +560,9 @@ export function TransactionWorkspace({ signature }: { signature: string }) {
           )}
           <p>
             Program labels are address-based reference labels, not proof of user
-            intent. Token symbols are shown only for recognized mints. Other
-            tokens use their mint address.
+            intent. Token labels disclose their metadata source separately from
+            balance evidence. Names and tickers are not unique; compare the full
+            mint.
           </p>
           <div className="button-row">
             {tx.source.file && (

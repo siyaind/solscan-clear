@@ -19,6 +19,7 @@ import { ImpactCanvas } from "./impact-canvas";
 import { RelationshipCanvas } from "./relationship-canvas";
 import { EvidenceView } from "./evidence-inspector";
 import { ProofCard } from "./proof-card";
+import { TokenIdentityCaption, TokenIdentityDetails } from "./token-identity";
 
 const depths: {
   layer: Layer;
@@ -148,6 +149,7 @@ export function AnatomyStage({
                     : "Net decrease"}
               <ArrowUpRight size={13} />
             </span>
+            <TokenIdentityCaption identity={item.identity} />
           </button>
         ))}
       </div>
@@ -232,6 +234,10 @@ export function AnatomyStage({
               : "Recorded token-account balance"}{" "}
             · <code>{short(asset.account, 5)}</code>
           </p>
+          <TokenIdentityDetails
+            identity={asset.identity}
+            account={asset.account}
+          />
         </div>
         <div className="anchor-balances">
           <div>

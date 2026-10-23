@@ -2,6 +2,12 @@ import "server-only";
 import { z } from "zod";
 import { isAddress, isSignature } from "./format";
 import { rpc, RpcError } from "./rpc";
+import { TOKEN, TOKEN_2022 } from "./model";
+import {
+  createTokenIdentityResolver,
+  tokenIdentityResolver,
+} from "./token-identity-resolver";
+import { knownTokenIdentity, type TokenIdentity } from "./token-identity";
 
 const numeric = z.union([
   z.string().regex(/^\d+$/),
@@ -89,8 +95,40 @@ export async function fetchAccount(
       }
     : null;
   const signatures = historyData?.success ? historyData.data : [];
+  const parsedAccount = parsed as
+    { type?: unknown; info?: { mint?: unknown } } | undefined;
+  const tokenProgram =
+    rawAccount &&
+    [TOKEN, TOKEN_2022].includes(rawAccount.owner) &&
+    !rawAccount.executable;
+  const mint =
+    tokenProgram && parsedAccount?.type === "mint"
+      ? address
+      : tokenProgram &&
+          parsedAccount?.type === "account" &&
+          typeof parsedAccount.info?.mint === "string" &&
+          isAddress(parsedAccount.info.mint)
+        ? parsedAccount.info.mint
+        : undefined;
+  let tokenIdentity: TokenIdentity | undefined;
+  if (mint) {
+    const resolver =
+      call === rpc ? tokenIdentityResolver : createTokenIdentityResolver(call);
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    try {
+      tokenIdentity = await Promise.race([
+        resolver.resolve(mint),
+        new Promise<TokenIdentity>((resolve) => {
+          timer = setTimeout(() => resolve(knownTokenIdentity(mint)), 4000);
+        }),
+      ]);
+    } finally {
+      if (timer) clearTimeout(timer);
+    }
+  }
   return {
     address,
+    tokenIdentity,
     account,
     accountAvailable: accountData?.success ?? false,
     historyAvailable: historyData?.success ?? false,

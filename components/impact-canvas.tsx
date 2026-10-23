@@ -4,6 +4,7 @@ import { ArrowUpRight, Check, CircleHelp, Braces } from "lucide-react";
 import { units } from "@/lib/format";
 import { balancePosition, explainBalance } from "@/lib/anatomy";
 import type { AssetChange, Transaction } from "@/lib/model";
+import { TokenIdentityDetails } from "./token-identity";
 
 export function ImpactCanvas({
   tx,
@@ -300,6 +301,7 @@ export function ImpactCanvas({
           Reveal balance proof <ArrowUpRight size={13} />
         </button>
       </div>
+      <TokenIdentityDetails identity={asset.identity} account={asset.account} />
     </section>
   );
 }

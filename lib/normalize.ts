@@ -1,11 +1,10 @@
 import { integer, short, units } from "./format";
+import { knownTokenIdentity, NATIVE_SOL } from "./token-identity";
 import {
   PROGRAMS,
   SYSTEM,
   TOKEN,
   TOKEN_2022,
-  USDC,
-  WSOL,
   rpcTransactionSchema,
   type AssetChange,
   type Component,
@@ -281,13 +280,15 @@ export function normalize(
             symbol:
               program === SYSTEM
                 ? "SOL"
-                : mint === USDC
-                  ? "USDC"
-                  : mint === WSOL
-                    ? "wSOL"
-                    : mint
-                      ? short(mint, 4)
-                      : "token units",
+                : mint
+                  ? knownTokenIdentity(mint).symbol
+                  : "token units",
+            identity:
+              program === SYSTEM
+                ? NATIVE_SOL
+                : mint
+                  ? knownTokenIdentity(mint)
+                  : undefined,
             amountBasis: program === SYSTEM ? "native" : "instruction",
             transferFee:
               transferFee !== null && transferFee >= 0n
@@ -354,6 +355,7 @@ export function normalize(
     account: a.address,
     mint: "native",
     symbol: "SOL",
+    identity: NATIVE_SOL,
     decimals: 9,
     before: a.before,
     after: a.after,
@@ -421,8 +423,8 @@ export function normalize(
       continue;
     }
     const id = `token:${tokenKey}`;
-    const symbol =
-      mint === USDC ? "USDC" : mint === WSOL ? "wSOL" : short(mint, 4);
+    const identity = knownTokenIdentity(mint);
+    const symbol = identity.symbol;
     assets.push({
       id,
       account,
@@ -432,6 +434,7 @@ export function normalize(
       ownership,
       mint,
       symbol,
+      identity,
       decimals,
       before: before?.toString() ?? null,
       after: after?.toString() ?? null,

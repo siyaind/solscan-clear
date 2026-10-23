@@ -5,7 +5,10 @@ import { ArrowLeft, ArrowUpRight, ArrowRight, Wallet } from "lucide-react";
 import { units, short } from "@/lib/format";
 import { Address, ErrorState, Loading } from "./ui";
 import { UniversalSearch } from "./search";
+import type { TokenIdentity } from "@/lib/token-identity";
+import { TokenIdentityCaption, TokenIdentityDetails } from "./token-identity";
 type AccountResult = {
+  tokenIdentity?: TokenIdentity;
   address: string;
   account: null | {
     lamports: string;
@@ -151,6 +154,14 @@ export function AccountExplorer({ address }: { address: string }) {
                 : "ACCOUNT DETAILS UNAVAILABLE"}
           </span>
           <Address value={address} full />
+          {data.tokenIdentity && (
+            <>
+              <strong>
+                {data.tokenIdentity.symbol} · {data.tokenIdentity.name}
+              </strong>
+              <TokenIdentityCaption identity={data.tokenIdentity} />
+            </>
+          )}
         </div>
         <strong>
           {data.account
@@ -160,6 +171,10 @@ export function AccountExplorer({ address }: { address: string }) {
               : "Unavailable"}
         </strong>
       </div>
+      <TokenIdentityDetails
+        identity={data.tokenIdentity}
+        account={type === "account" ? address : undefined}
+      />
       {data.account && (
         <details className="account-details panel">
           <summary>Account owner & parsed data</summary>
